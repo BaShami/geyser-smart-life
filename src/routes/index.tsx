@@ -266,7 +266,7 @@ function DemoBlock({
         <div className="relative rounded-[2.5rem] overflow-hidden shadow-float bg-black aspect-[4/5]">
           <video
             ref={videoRef}
-            src="/reaction.mp4"
+            src={reactionVideo.url}
             preload="metadata"
             playsInline
             muted
