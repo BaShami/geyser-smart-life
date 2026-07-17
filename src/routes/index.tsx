@@ -740,24 +740,23 @@ function Landing() {
       </section>
 
       {/* 3. Is this for you? */}
-      <section className="py-24 md:py-32 px-6 bg-secondary/40">
+      <section id="qualifies" className="scroll-mt-24 py-20 md:py-32 px-6 bg-secondary/40">
         <div className="max-w-3xl mx-auto">
           <Reveal>
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">
               Is this for you?
             </div>
-            <h2 className="text-3xl md:text-5xl mb-12">A short list. Nothing hidden.</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl mb-10 md:mb-12">A short list. Nothing hidden.</h2>
           </Reveal>
-          <ul className="space-y-6">
+          <ul className="space-y-5 md:space-y-6">
             {[
-              "You own a standard electric geyser (not gas, not a heat pump).",
-              "You — or your landlord, with permission — can access your home's distribution board.",
-              "Wi-Fi reaches the geyser's location (2.4GHz).",
-              `You're within our current install area: ${CITIES}.`,
+              "You have a geyser.",
+              "You have Wi-Fi at home.",
+              "You live in Pretoria or Johannesburg.",
             ].map((line, i) => (
               <Reveal key={i} delay={i * 60}>
-                <li className="flex items-start gap-4 text-lg">
-                  <div className="mt-1.5 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <li className="flex items-start gap-4 text-base sm:text-lg">
+                  <div className="mt-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                     <Check className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
                   </div>
                   <span className="leading-relaxed">{line}</span>
@@ -769,6 +768,13 @@ function Landing() {
             <p className="text-sm text-muted-foreground italic mt-10 pl-10">
               Not sure? Message us and we'll check together — no obligation.
             </p>
+          </Reveal>
+          <Reveal delay={260}>
+            <div className="mt-8 pl-10">
+              <PillLink href={wa("Hi, I'd like to check if my home qualifies for GeyserBrain")}>
+                Message us to check
+              </PillLink>
+            </div>
           </Reveal>
         </div>
       </section>
