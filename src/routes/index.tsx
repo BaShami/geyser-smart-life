@@ -7,14 +7,12 @@ import homeImg from "@/assets/home.jpg";
 import reactionVideo from "@/assets/reaction.mp4.asset.json";
 import logoAsset from "@/assets/geyserbrain-logo.png.asset.json";
 
-
 export const Route = createFileRoute("/")({
   component: Landing,
 });
 
 const WA_NUMBER = "27744224646";
-const wa = (text: string) =>
-  `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
+const wa = (text: string) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
 
 const CITIES = "Pretoria & Johannesburg";
 
@@ -113,10 +111,7 @@ const SCRIPT: Msg[] = [
 const TIMES = ["09:41", "09:41", "09:42", "09:42", "09:43", "09:43"];
 const REACTION_MSG_INDEX = 3;
 
-type Step =
-  | { type: "delay"; ms: number }
-  | { type: "typing"; on: boolean }
-  | { type: "send"; index: number };
+type Step = { type: "delay"; ms: number } | { type: "typing"; on: boolean } | { type: "send"; index: number };
 
 function buildSteps(): Step[] {
   const s: Step[] = [];
@@ -244,10 +239,7 @@ function DemoBlock({
 
   const pauseAll = useCallback(() => {
     clearTimer();
-    timerRemainingRef.current = Math.max(
-      0,
-      timerRemainingRef.current - (Date.now() - timerStartedAtRef.current),
-    );
+    timerRemainingRef.current = Math.max(0, timerRemainingRef.current - (Date.now() - timerStartedAtRef.current));
     videoRef.current?.pause();
     setPlaying(false);
   }, []);
@@ -356,10 +348,7 @@ function DemoBlock({
     if (!next && v.currentTime > 0 && !v.ended) v.play().catch(() => {});
   };
 
-  const lastThemVisible = Math.max(
-    -1,
-    ...visibleIdx.filter((i) => SCRIPT[i].from === "them"),
-  );
+  const lastThemVisible = Math.max(-1, ...visibleIdx.filter((i) => SCRIPT[i].from === "them"));
 
   return (
     <div ref={sectionRef} className="space-y-8">
@@ -409,10 +398,7 @@ function DemoBlock({
               style={{ backgroundColor: "#ECE5DD" }}
             >
               {/* WhatsApp header */}
-              <div
-                className="px-4 py-3 flex items-center gap-3"
-                style={{ backgroundColor: "#075E54", color: "white" }}
-              >
+              <div className="px-4 py-3 flex items-center gap-3" style={{ backgroundColor: "#075E54", color: "white" }}>
                 <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white font-semibold">
                   G
                 </div>
@@ -429,8 +415,7 @@ function DemoBlock({
                 className="px-4 py-5 space-y-1.5 min-h-[440px]"
                 style={{
                   backgroundColor: "#ECE5DD",
-                  backgroundImage:
-                    "radial-gradient(oklch(0 0 0 / 0.04) 1px, transparent 1px)",
+                  backgroundImage: "radial-gradient(oklch(0 0 0 / 0.04) 1px, transparent 1px)",
                   backgroundSize: "14px 14px",
                 }}
               >
@@ -461,14 +446,10 @@ function DemoBlock({
                         {/* Tail */}
                         <span
                           aria-hidden
-                          className={`absolute bottom-0 w-2 h-2 ${
-                            isMe ? "-right-1" : "-left-1"
-                          }`}
+                          className={`absolute bottom-0 w-2 h-2 ${isMe ? "-right-1" : "-left-1"}`}
                           style={{
                             backgroundColor: isMe ? "#DCF8C6" : "#FFFFFF",
-                            clipPath: isMe
-                              ? "polygon(0 0, 100% 100%, 0 100%)"
-                              : "polygon(100% 0, 100% 100%, 0 100%)",
+                            clipPath: isMe ? "polygon(0 0, 100% 100%, 0 100%)" : "polygon(100% 0, 100% 100%, 0 100%)",
                           }}
                         />
                       </div>
@@ -497,9 +478,7 @@ function DemoBlock({
       <div className="flex justify-center">
         <button
           onClick={togglePlay}
-          aria-label={
-            finished ? "Replay demo" : playing ? "Pause demo" : "Play demo"
-          }
+          aria-label={finished ? "Replay demo" : playing ? "Pause demo" : "Play demo"}
           className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card px-5 py-2.5 text-sm font-medium text-foreground shadow-soft hover:-translate-y-0.5 hover:shadow-float transition-all"
         >
           {finished ? (
@@ -551,13 +530,7 @@ function FloatingWA() {
 
 /* ---------- Green "See it work" reveal button ---------- */
 
-function SeeItWorkButton({
-  onArm,
-  className = "",
-}: {
-  onArm: () => void;
-  className?: string;
-}) {
+function SeeItWorkButton({ onArm, className = "" }: { onArm: () => void; className?: string }) {
   const ref = useRef<HTMLButtonElement>(null);
   const [bounced, setBounced] = useState(false);
   useEffect(() => {
@@ -581,9 +554,7 @@ function SeeItWorkButton({
       onClick={(e) => {
         e.preventDefault();
         onArm();
-        document
-          .getElementById("demo")
-          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        document.getElementById("demo")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }}
       className={`relative inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-medium text-white transition-all duration-150 hover:-translate-y-0.5 motion-safe:animate-[glow_3s_ease-in-out_infinite] ${
         bounced ? "motion-safe:animate-[softBounce_.9s_ease-out_1]" : ""
@@ -644,11 +615,7 @@ function Landing() {
   const soundArmedRef = useRef(false);
 
   return (
-    <div
-      className={`min-h-screen bg-background text-foreground overflow-x-hidden ${
-        bloomed ? "bloomed" : ""
-      }`}
-    >
+    <div className={`min-h-screen bg-background text-foreground overflow-x-hidden ${bloomed ? "bloomed" : ""}`}>
       <style>{`
         @keyframes fadeRise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes dot { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-2px); } }
@@ -673,10 +640,18 @@ function Landing() {
             <span className="hidden sm:inline truncate">GeyserBrain</span>
           </a>
           <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-            <a href="#how" className="hover:text-foreground transition">How it works</a>
-            <a href="#benefits" className="hover:text-foreground transition">Benefits</a>
-            <a href="#pricing" className="hover:text-foreground transition">Pricing</a>
-            <a href="#faq" className="hover:text-foreground transition">FAQ</a>
+            <a href="#how" className="hover:text-foreground transition">
+              How it works
+            </a>
+            <a href="#benefits" className="hover:text-foreground transition">
+              Benefits
+            </a>
+            <a href="#pricing" className="hover:text-foreground transition">
+              Pricing
+            </a>
+            <a href="#faq" className="hover:text-foreground transition">
+              FAQ
+            </a>
           </nav>
           <a
             href={wa("GEYSER")}
@@ -700,16 +675,20 @@ function Landing() {
         <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-10 flex items-end md:items-center">
           <div className="pb-20 md:pb-0 max-w-2xl text-white space-y-5 md:space-y-6">
             <h1 className="text-[2.75rem] leading-[1] sm:text-6xl md:text-7xl tracking-tight">
-              Smart home.<br />
+              Smart home.
+              <br />
               <span className="italic text-white/80">Soft life.</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-white/85 max-w-lg leading-relaxed">
-              Talk to your home on WhatsApp. Manage your electricity through natural language, when you need it. No new app, no manual — just talk.
+              Talk to your home on WhatsApp. Manage your electricity with natural language "if you can text, you can
+              talk to your home", when you need it just talk.
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
               <button
                 type="button"
-                onClick={() => document.getElementById("qualifies")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                onClick={() =>
+                  document.getElementById("qualifies")?.scrollIntoView({ behavior: "smooth", block: "start" })
+                }
                 className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
               >
                 Check if my home qualifies
@@ -727,12 +706,8 @@ function Landing() {
       {/* 2. Philosophy */}
       <section className="py-32 md:py-40 px-6">
         <Reveal className="max-w-3xl mx-auto text-center space-y-8">
-          <div className="text-xs text-muted-foreground uppercase tracking-[0.25em]">
-            The quiet smart home
-          </div>
-          <h2 className="text-4xl md:text-6xl leading-[1.05]">
-            Your home shouldn't feel mechanical.
-          </h2>
+          <div className="text-xs text-muted-foreground uppercase tracking-[0.25em]">The quiet smart home</div>
+          <h2 className="text-4xl md:text-6xl leading-[1.05]">Your home shouldn't feel mechanical.</h2>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
             No control panels to study. No complicated apps to manage. Just tell your home what you need.
           </p>
@@ -743,26 +718,22 @@ function Landing() {
       <section id="qualifies" className="scroll-mt-24 py-20 md:py-32 px-6 bg-secondary/40">
         <div className="max-w-3xl mx-auto">
           <Reveal>
-            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">
-              Is this for you?
-            </div>
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">Is this for you?</div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl mb-10 md:mb-12">A short list. Nothing hidden.</h2>
           </Reveal>
           <ul className="space-y-5 md:space-y-6">
-            {[
-              "You have a geyser.",
-              "You have Wi-Fi at home.",
-              "You live in Pretoria or Johannesburg.",
-            ].map((line, i) => (
-              <Reveal key={i} delay={i * 60}>
-                <li className="flex items-start gap-4 text-base sm:text-lg">
-                  <div className="mt-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <Check className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
-                  </div>
-                  <span className="leading-relaxed">{line}</span>
-                </li>
-              </Reveal>
-            ))}
+            {["You have a geyser.", "You have Wi-Fi at home.", "You live in Pretoria or Johannesburg."].map(
+              (line, i) => (
+                <Reveal key={i} delay={i * 60}>
+                  <li className="flex items-start gap-4 text-base sm:text-lg">
+                    <div className="mt-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <Check className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
+                    </div>
+                    <span className="leading-relaxed">{line}</span>
+                  </li>
+                </Reveal>
+              ),
+            )}
           </ul>
           <Reveal delay={200}>
             <p className="text-sm text-muted-foreground italic mt-10 pl-10">
@@ -783,17 +754,12 @@ function Landing() {
       <section id="demo" className="py-28 md:py-36 px-6">
         <div className="max-w-6xl mx-auto space-y-14">
           <Reveal className="max-w-2xl">
-            <h2 className="text-4xl md:text-5xl leading-tight">
-              A conversation, not a control panel.
-            </h2>
+            <h2 className="text-4xl md:text-5xl leading-tight">A conversation, not a control panel.</h2>
             <p className="text-lg text-muted-foreground max-w-md mt-4">
               Control your geyser the same way you'd ask someone at home.
             </p>
           </Reveal>
-          <DemoBlock
-            onBloom={() => setBloomed(true)}
-            soundArmedRef={soundArmedRef}
-          />
+          <DemoBlock onBloom={() => setBloomed(true)} soundArmedRef={soundArmedRef} />
         </div>
       </section>
 
@@ -822,9 +788,7 @@ function Landing() {
                 <div className="text-sm text-muted-foreground tracking-widest">{b.n}</div>
                 <div className="space-y-4">
                   <h3 className="text-3xl md:text-5xl leading-tight">{b.title}</h3>
-                  <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-                    {b.desc}
-                  </p>
+                  <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">{b.desc}</p>
                 </div>
               </div>
             </Reveal>
@@ -836,9 +800,7 @@ function Landing() {
       <section id="how" className="py-28 md:py-36 px-6">
         <div className="max-w-6xl mx-auto">
           <Reveal className="text-center mb-20">
-            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">
-              How it works
-            </div>
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">How it works</div>
             <h2 className="text-4xl md:text-5xl">Three quiet steps.</h2>
           </Reveal>
           <div className="relative grid md:grid-cols-3 gap-12 md:gap-8">
@@ -895,7 +857,8 @@ function Landing() {
           <Reveal delay={100}>
             <div className="space-y-8">
               <h2 className="text-4xl md:text-5xl leading-tight">
-                Installed properly.<br />
+                Installed properly.
+                <br />
                 <span className="italic text-muted-foreground">Designed to disappear</span> into your home.
               </h2>
               <ul className="space-y-4 text-lg">
@@ -919,9 +882,7 @@ function Landing() {
       <section id="pricing" className="py-28 md:py-36 px-6 bg-primary text-primary-foreground">
         <div className="max-w-3xl mx-auto text-center space-y-10">
           <Reveal>
-            <div className="text-xs uppercase tracking-[0.3em] text-primary-foreground/60">
-              First 10 homes only
-            </div>
+            <div className="text-xs uppercase tracking-[0.3em] text-primary-foreground/60">First 10 homes only</div>
           </Reveal>
           <Reveal delay={80}>
             <div>
@@ -944,9 +905,7 @@ function Landing() {
                   </li>
                 ))}
               </ul>
-              <p className="text-xs text-primary-foreground/60 mt-6">
-                Thereafter R99/month. Cancel anytime.
-              </p>
+              <p className="text-xs text-primary-foreground/60 mt-6">Thereafter R99/month. Cancel anytime.</p>
             </div>
           </Reveal>
           <Reveal delay={200}>
@@ -961,9 +920,7 @@ function Landing() {
       <section id="faq" className="py-28 md:py-36 px-6">
         <div className="max-w-3xl mx-auto">
           <Reveal className="text-center mb-16">
-            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">
-              FAQ
-            </div>
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">FAQ</div>
             <h2 className="text-4xl md:text-5xl">Quiet answers.</h2>
           </Reveal>
           <div className="space-y-3">
@@ -1016,7 +973,8 @@ function Landing() {
         <div className="relative z-10 h-full flex items-center justify-center px-6">
           <div className="text-center text-white space-y-6 md:space-y-8 max-w-2xl">
             <h2 className="text-4xl sm:text-5xl md:text-7xl tracking-tight leading-[1.05]">
-              Switch off the work.<br />
+              Switch off the work.
+              <br />
               <span className="italic text-white/85">Switch on soft life.</span>
             </h2>
             <p className="text-base md:text-lg text-white/80 max-w-md mx-auto">
@@ -1025,7 +983,9 @@ function Landing() {
             <div className="pt-2 flex justify-center">
               <button
                 type="button"
-                onClick={() => document.getElementById("qualifies")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                onClick={() =>
+                  document.getElementById("qualifies")?.scrollIntoView({ behavior: "smooth", block: "start" })
+                }
                 className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
               >
                 Check if my home qualifies
@@ -1043,8 +1003,12 @@ function Landing() {
             <span className="text-foreground font-medium">GeyserBrain</span>
           </div>
           <div className="flex items-center gap-6">
-            <a href="/privacy" className="hover:text-foreground transition">Privacy Policy</a>
-            <a href="/terms" className="hover:text-foreground transition">Terms of Service</a>
+            <a href="/privacy" className="hover:text-foreground transition">
+              Privacy Policy
+            </a>
+            <a href="/terms" className="hover:text-foreground transition">
+              Terms of Service
+            </a>
           </div>
           <p>© {new Date().getFullYear()} GeyserBrain. Smart home. Soft life.</p>
         </div>
