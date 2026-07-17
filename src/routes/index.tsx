@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, MessageCircle, Volume2, VolumeX, Play } from "lucide-react";
+import { Check, ChevronDown, MessageCircle, Volume2, VolumeX, Play, Pause, RotateCcw } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import electricianImg from "@/assets/electrician.jpg";
 import homeImg from "@/assets/home.jpg";
