@@ -700,8 +700,9 @@ function Landing() {
               Smart home.<br />
               <span className="italic text-white/80">Soft life.</span>
             </h1>
-            <p className="text-lg md:text-xl text-white/85 max-w-lg leading-relaxed">
-              Your geyser, one WhatsApp away. Check it, control it, schedule it, and understand what it costs.
+            <p className="text-lg md:text-xl text-white/85 max-w-lg leading-relaxed whitespace-pre-line">
+              Talk to your home on WhatsApp.&nbsp;
+              {"\n"}Manage your electricity through natural language and when you need it. No new app, no manual — just talk..
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-2">
               <PillLink
