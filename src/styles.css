@@ -86,3 +86,15 @@
 @utility shadow-float {
   box-shadow: var(--shadow-float);
 }
+
+@utility duotone {
+  filter: grayscale(1) sepia(0.55) saturate(1.5) hue-rotate(-8deg) contrast(1.03) brightness(0.96);
+  transition: filter 900ms ease-out;
+}
+.bloomed .duotone {
+  filter: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .duotone { transition: none; }
+}
+
