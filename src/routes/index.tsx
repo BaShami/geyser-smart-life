@@ -5,6 +5,7 @@ import heroImg from "@/assets/hero.jpg";
 import electricianImg from "@/assets/electrician.jpg";
 import homeImg from "@/assets/home.jpg";
 import reactionVideo from "@/assets/reaction.mp4.asset.json";
+import logoAsset from "@/assets/geyserbrain-logo.png.asset.json";
 
 
 export const Route = createFileRoute("/")({
@@ -350,6 +351,8 @@ function DemoBlock({
     const next = !muted;
     v.muted = next;
     setMuted(next);
+    // Once the user unmutes, treat sound as armed so later autoplay triggers don't remute.
+    if (!next) soundArmedRef.current = true;
     if (!next && v.currentTime > 0 && !v.ended) v.play().catch(() => {});
   };
 
@@ -663,12 +666,12 @@ function Landing() {
       `}</style>
 
       {/* Nav */}
-      <header className="fixed top-4 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-5xl">
-        <div className="rounded-full bg-white/70 backdrop-blur-xl border border-border/60 shadow-soft px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-medium">
-            <div className="w-7 h-7 rounded-full bg-primary" />
-            <span>GeyserBrain</span>
-          </div>
+      <header className="fixed top-3 md:top-4 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-5xl">
+        <div className="rounded-full bg-white/70 backdrop-blur-xl border border-border/60 shadow-soft pl-3 pr-3 md:pl-5 md:pr-5 py-2 md:py-3 flex items-center justify-between gap-3">
+          <a href="#" className="flex items-center gap-2 font-medium min-w-0">
+            <img src={logoAsset.url} alt="GeyserBrain" className="h-7 md:h-8 w-auto shrink-0" />
+            <span className="hidden sm:inline truncate">GeyserBrain</span>
+          </a>
           <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
             <a href="#how" className="hover:text-foreground transition">How it works</a>
             <a href="#benefits" className="hover:text-foreground transition">Benefits</a>
@@ -679,7 +682,7 @@ function Landing() {
             href={wa("GEYSER")}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-5 py-2 text-xs font-medium hover:opacity-90 transition"
+            className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-4 md:px-5 py-2 text-xs font-medium hover:opacity-90 transition shrink-0"
           >
             Message us
           </a>
@@ -687,30 +690,30 @@ function Landing() {
       </header>
 
       {/* 1. Hero */}
-      <section className="relative h-screen min-h-[640px] w-full overflow-hidden">
+      <section className="relative h-[100svh] min-h-[560px] w-full overflow-hidden">
         <img
           src={heroImg}
           alt="A calm, softly lit home interior"
           className="absolute inset-0 w-full h-full object-cover duotone"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent md:from-black/60 md:via-black/25" />
         <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-10 flex items-end md:items-center">
-          <div className="pb-16 md:pb-0 max-w-2xl text-white space-y-6">
-            <h1 className="text-5xl md:text-7xl leading-[0.95] tracking-tight">
+          <div className="pb-20 md:pb-0 max-w-2xl text-white space-y-5 md:space-y-6">
+            <h1 className="text-[2.75rem] leading-[1] sm:text-6xl md:text-7xl tracking-tight">
               Smart home.<br />
               <span className="italic text-white/80">Soft life.</span>
             </h1>
-            <p className="text-lg md:text-xl text-white/85 max-w-lg leading-relaxed whitespace-pre-line">
-              Talk to your home on WhatsApp.&nbsp;
-              {"\n"}Manage your electricity through natural language, when you need it. No new app, no manual — just talk...
+            <p className="text-base sm:text-lg md:text-xl text-white/85 max-w-lg leading-relaxed">
+              Talk to your home on WhatsApp. Manage your electricity through natural language, when you need it. No new app, no manual — just talk.
             </p>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-2">
-              <PillLink
-                href={wa("Hi, I'd like to check if my home qualifies for GeyserBrain")}
-                variant="light"
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
+              <button
+                type="button"
+                onClick={() => document.getElementById("qualifies")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
               >
                 Check if my home qualifies
-              </PillLink>
+              </button>
               <SeeItWorkButton
                 onArm={() => {
                   soundArmedRef.current = true;
@@ -737,24 +740,23 @@ function Landing() {
       </section>
 
       {/* 3. Is this for you? */}
-      <section className="py-24 md:py-32 px-6 bg-secondary/40">
+      <section id="qualifies" className="scroll-mt-24 py-20 md:py-32 px-6 bg-secondary/40">
         <div className="max-w-3xl mx-auto">
           <Reveal>
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">
               Is this for you?
             </div>
-            <h2 className="text-3xl md:text-5xl mb-12">A short list. Nothing hidden.</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl mb-10 md:mb-12">A short list. Nothing hidden.</h2>
           </Reveal>
-          <ul className="space-y-6">
+          <ul className="space-y-5 md:space-y-6">
             {[
-              "You own a standard electric geyser (not gas, not a heat pump).",
-              "You — or your landlord, with permission — can access your home's distribution board.",
-              "Wi-Fi reaches the geyser's location (2.4GHz).",
-              `You're within our current install area: ${CITIES}.`,
+              "You have a geyser.",
+              "You have Wi-Fi at home.",
+              "You live in Pretoria or Johannesburg.",
             ].map((line, i) => (
               <Reveal key={i} delay={i * 60}>
-                <li className="flex items-start gap-4 text-lg">
-                  <div className="mt-1.5 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <li className="flex items-start gap-4 text-base sm:text-lg">
+                  <div className="mt-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                     <Check className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
                   </div>
                   <span className="leading-relaxed">{line}</span>
@@ -766,6 +768,13 @@ function Landing() {
             <p className="text-sm text-muted-foreground italic mt-10 pl-10">
               Not sure? Message us and we'll check together — no obligation.
             </p>
+          </Reveal>
+          <Reveal delay={260}>
+            <div className="mt-8 pl-10">
+              <PillLink href={wa("Hi, I'd like to check if my home qualifies for GeyserBrain")}>
+                Message us to check
+              </PillLink>
+            </div>
           </Reveal>
         </div>
       </section>
@@ -1005,18 +1014,22 @@ function Landing() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/20" />
         <div className="relative z-10 h-full flex items-center justify-center px-6">
-          <div className="text-center text-white space-y-8 max-w-2xl">
-            <h2 className="text-5xl md:text-7xl tracking-tight leading-[1.02]">
+          <div className="text-center text-white space-y-6 md:space-y-8 max-w-2xl">
+            <h2 className="text-4xl sm:text-5xl md:text-7xl tracking-tight leading-[1.05]">
               Switch off the work.<br />
               <span className="italic text-white/85">Switch on soft life.</span>
             </h2>
-            <p className="text-lg text-white/80 max-w-md mx-auto">
+            <p className="text-base md:text-lg text-white/80 max-w-md mx-auto">
               Your home handles the routine. You enjoy the comfort.
             </p>
             <div className="pt-2 flex justify-center">
-              <PillLink href={wa("GEYSER")} variant="light">
+              <button
+                type="button"
+                onClick={() => document.getElementById("qualifies")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
+              >
                 Check if my home qualifies
-              </PillLink>
+              </button>
             </div>
           </div>
         </div>
@@ -1026,7 +1039,7 @@ function Landing() {
       <footer className="py-12 px-6 border-t border-border/60">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-primary" />
+            <img src={logoAsset.url} alt="GeyserBrain" className="h-7 w-auto" />
             <span className="text-foreground font-medium">GeyserBrain</span>
           </div>
           <div className="flex items-center gap-6">
