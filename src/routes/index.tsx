@@ -351,6 +351,8 @@ function DemoBlock({
     const next = !muted;
     v.muted = next;
     setMuted(next);
+    // Once the user unmutes, treat sound as armed so later autoplay triggers don't remute.
+    if (!next) soundArmedRef.current = true;
     if (!next && v.currentTime > 0 && !v.ended) v.play().catch(() => {});
   };
 
