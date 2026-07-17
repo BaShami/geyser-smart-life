@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, MessageCircle } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Check, ChevronDown, MessageCircle, Volume2, VolumeX, Play } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import electricianImg from "@/assets/electrician.jpg";
 import homeImg from "@/assets/home.jpg";
@@ -14,7 +14,10 @@ const wa = (text: string) =>
   `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
 
 const CITIES = "Pretoria & Johannesburg";
-const SPOTS_TAKEN = 10;
+
+// Timothy: set to the exact second in reaction.mp4 where the visible reaction happens.
+// Until set, the bloom triggers when message 4 ("Done. It's heating now.") appears.
+const REACTION_TIMESTAMP: number | null = null;
 
 /* ---------- primitives ---------- */
 
@@ -23,11 +26,13 @@ function PillLink({
   children,
   variant = "primary",
   className = "",
+  onClick,
 }: {
   href: string;
   children: React.ReactNode;
   variant?: "primary" | "light" | "ghost";
   className?: string;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }) {
   const base =
     "inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-medium transition-all duration-150 hover:-translate-y-0.5";
@@ -42,6 +47,7 @@ function PillLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={onClick}
       className={`${base} ${styles} ${className}`}
     >
       {children}
@@ -49,7 +55,7 @@ function PillLink({
   );
 }
 
-/* ---------- Reveal wrapper: fade + rise on scroll ---------- */
+/* ---------- Reveal ---------- */
 
 function Reveal({
   children,
@@ -90,24 +96,47 @@ function Reveal({
   );
 }
 
-/* ---------- Animated WhatsApp demo ---------- */
+/* ---------- WhatsApp demo + reaction video ---------- */
 
 type Msg = { from: "me" | "them"; text: string };
 const SCRIPT: Msg[] = [
-  { from: "me", text: "Heat the water for 45 minutes." },
-  { from: "them", text: "Done. I'll switch it off automatically when the time is up." },
-  { from: "me", text: "And have it ready tomorrow at 6am." },
-  { from: "them", text: "Your weekday morning schedule is set." },
+  { from: "me", text: "Is the geyser on right now?" },
+  { from: "them", text: "It's off at the moment." },
+  { from: "me", text: "Switch it on — I need a shower." },
+  { from: "them", text: "Done. It's heating now." },
+  { from: "me", text: "Can you have it ready every weekday at 6am too?" },
+  { from: "them", text: "Got it — set for every weekday at 6am." },
 ];
+// Index of the "reaction moment" message.
+const REACTION_MSG_INDEX = 3;
 
-function WhatsAppDemo() {
-  const containerRef = useRef<HTMLDivElement>(null);
+function DemoBlock({
+  onBloom,
+  soundArmedRef,
+}: {
+  onBloom: () => void;
+  soundArmedRef: React.MutableRefObject<boolean>;
+}) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [visible, setVisible] = useState<Msg[]>([]);
   const [typing, setTyping] = useState(false);
   const [started, setStarted] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const [showCaption, setShowCaption] = useState(false);
+  const [reduce, setReduce] = useState(false);
+  const bloomedRef = useRef(false);
 
+  const triggerBloom = useCallback(() => {
+    if (bloomedRef.current) return;
+    bloomedRef.current = true;
+    setShowCaption(true);
+    onBloom();
+  }, [onBloom]);
+
+  // Start on scroll into view
   useEffect(() => {
-    const el = containerRef.current;
+    const el = sectionRef.current;
     if (!el) return;
     const io = new IntersectionObserver(
       ([e]) => e.isIntersecting && setStarted(true),
@@ -117,46 +146,75 @@ function WhatsAppDemo() {
     return () => io.disconnect();
   }, []);
 
+  // Motion preference
+  useEffect(() => {
+    const m = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduce(m.matches);
+    const handler = () => setReduce(m.matches);
+    m.addEventListener?.("change", handler);
+    return () => m.removeEventListener?.("change", handler);
+  }, []);
+
+  // Prime video: hold at first frame until reaction message
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    // Load first frame
+    try {
+      v.currentTime = 0.01;
+    } catch {}
+  }, []);
+
+  // Message sequence
   useEffect(() => {
     if (!started) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
       setVisible(SCRIPT);
+      triggerBloom();
       return;
     }
     let cancelled = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
+    const wait = (ms: number) =>
+      new Promise<void>((r) => {
+        const t = setTimeout(r, ms);
+        timers.push(t);
+      });
+
     const run = async () => {
       for (let i = 0; i < SCRIPT.length; i++) {
         const msg = SCRIPT[i];
         if (msg.from === "them") {
-          await new Promise<void>((r) => {
-            const t = setTimeout(() => {
-              if (cancelled) return;
-              setTyping(true);
-              r();
-            }, 700);
-            timers.push(t);
-          });
-          await new Promise<void>((r) => {
-            const t = setTimeout(r, 1100);
-            timers.push(t);
-          });
+          await wait(500);
+          if (cancelled) return;
+          setTyping(true);
+          await wait(900);
           if (cancelled) return;
           setTyping(false);
         }
-        await new Promise<void>((r) => {
-          const t = setTimeout(() => {
-            if (cancelled) return;
-            setVisible((v) => [...v, msg]);
-            r();
-          }, 350);
-          timers.push(t);
-        });
-        await new Promise<void>((r) => {
-          const t = setTimeout(r, 900);
-          timers.push(t);
-        });
+        await wait(300);
+        if (cancelled) return;
+        setVisible((v) => [...v, msg]);
+
+        // Reaction moment: play video (and, if no explicit timestamp, bloom now)
+        if (i === REACTION_MSG_INDEX) {
+          const v = videoRef.current;
+          if (v) {
+            const armed = soundArmedRef.current;
+            v.muted = !armed;
+            setMuted(!armed);
+            v.play().catch(() => {
+              // Autoplay blocked with sound; retry muted
+              v.muted = true;
+              setMuted(true);
+              v.play().catch(() => {});
+            });
+          }
+          if (REACTION_TIMESTAMP == null) triggerBloom();
+        }
+
+        await wait(900);
       }
     };
     run();
@@ -164,54 +222,136 @@ function WhatsAppDemo() {
       cancelled = true;
       timers.forEach(clearTimeout);
     };
-  }, [started]);
+  }, [started, reduce, triggerBloom, soundArmedRef]);
+
+  // Timestamp-based bloom
+  useEffect(() => {
+    if (REACTION_TIMESTAMP == null) return;
+    const v = videoRef.current;
+    if (!v) return;
+    const onTime = () => {
+      if (v.currentTime >= (REACTION_TIMESTAMP as number)) {
+        triggerBloom();
+        v.removeEventListener("timeupdate", onTime);
+      }
+    };
+    v.addEventListener("timeupdate", onTime);
+    return () => v.removeEventListener("timeupdate", onTime);
+  }, [triggerBloom]);
+
+  const toggleMute = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    const next = !muted;
+    v.muted = next;
+    setMuted(next);
+    if (!next) v.play().catch(() => {});
+  };
+
+  const manualPlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.play().catch(() => {});
+  };
 
   return (
     <div
-      ref={containerRef}
-      className="rounded-[2.5rem] bg-white shadow-float overflow-hidden border border-border/40 max-w-md mx-auto"
+      ref={sectionRef}
+      className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center"
     >
-      <div className="bg-secondary/60 px-6 py-4 flex items-center gap-3 border-b border-border/40">
-        <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-          <MessageCircle className="w-5 h-5" />
-        </div>
-        <div>
-          <div className="font-medium text-sm">GeyserBrain</div>
-          <div className="text-xs text-muted-foreground">online</div>
-        </div>
-      </div>
-      <div className="p-6 space-y-3 bg-[oklch(0.98_0_0)] min-h-[360px]">
-        {visible.map((m, i) => (
-          <div
-            key={i}
-            className={`flex ${m.from === "me" ? "justify-end" : "justify-start"} animate-[fadeRise_.55s_ease-out_both]`}
-          >
-            <div
-              className={`max-w-[80%] rounded-3xl px-5 py-3 text-sm ${
-                m.from === "me"
-                  ? "bg-primary text-primary-foreground rounded-br-lg"
-                  : "bg-white text-foreground rounded-bl-lg shadow-sm border border-border/40"
-              }`}
+      {/* Video */}
+      <Reveal>
+        <div className="relative rounded-[2.5rem] overflow-hidden shadow-float bg-black aspect-[4/5]">
+          <video
+            ref={videoRef}
+            src="/reaction.mp4"
+            preload="metadata"
+            playsInline
+            muted
+            className="w-full h-full object-cover duotone"
+          />
+          {reduce ? (
+            <button
+              onClick={manualPlay}
+              aria-label="Play reaction video"
+              className="absolute inset-0 flex items-center justify-center bg-black/20 text-white"
             >
-              {m.text}
+              <Play className="w-12 h-12" strokeWidth={1.5} />
+            </button>
+          ) : (
+            <button
+              onClick={toggleMute}
+              aria-label={muted ? "Unmute video" : "Mute video"}
+              className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-black/55 backdrop-blur text-white flex items-center justify-center hover:bg-black/70 transition"
+            >
+              {muted ? (
+                <VolumeX className="w-4 h-4" strokeWidth={1.75} />
+              ) : (
+                <Volume2 className="w-4 h-4" strokeWidth={1.75} />
+              )}
+            </button>
+          )}
+        </div>
+      </Reveal>
+
+      {/* Chat + floating caption */}
+      <Reveal delay={80}>
+        <div className="relative">
+          <div
+            className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-4 md:-top-6 z-10 transition-all duration-[550ms] ease-out ${
+              showCaption ? "opacity-100 -translate-y-1" : "opacity-0 translate-y-2"
+            }`}
+          >
+            <div className="rounded-full bg-white/90 backdrop-blur border border-border/60 shadow-soft px-5 py-2 text-sm font-medium">
+              It's heating now.
             </div>
           </div>
-        ))}
-        {typing && (
-          <div className="flex justify-start">
-            <div className="bg-white rounded-3xl rounded-bl-lg shadow-sm border border-border/40 px-5 py-3 flex gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-[dot_1.2s_ease-in-out_infinite]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-[dot_1.2s_ease-in-out_.15s_infinite]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-[dot_1.2s_ease-in-out_.3s_infinite]" />
+
+          <div className="rounded-[2.5rem] bg-white shadow-float overflow-hidden border border-border/40 max-w-md mx-auto">
+            <div className="bg-secondary/60 px-6 py-4 flex items-center gap-3 border-b border-border/40">
+              <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                <MessageCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="font-medium text-sm">GeyserBrain</div>
+                <div className="text-xs text-muted-foreground">online</div>
+              </div>
+            </div>
+            <div className="p-6 space-y-3 bg-[oklch(0.98_0_0)] min-h-[420px]">
+              {visible.map((m, i) => (
+                <div
+                  key={i}
+                  className={`flex ${m.from === "me" ? "justify-end" : "justify-start"} animate-[fadeRise_.55s_ease-out_both]`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-3xl px-5 py-3 text-sm ${
+                      m.from === "me"
+                        ? "bg-primary text-primary-foreground rounded-br-lg"
+                        : "bg-white text-foreground rounded-bl-lg shadow-sm border border-border/40"
+                    }`}
+                  >
+                    {m.text}
+                  </div>
+                </div>
+              ))}
+              {typing && (
+                <div className="flex justify-start">
+                  <div className="bg-white rounded-3xl rounded-bl-lg shadow-sm border border-border/40 px-5 py-3 flex gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-[dot_1.2s_ease-in-out_infinite]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-[dot_1.2s_ease-in-out_.15s_infinite]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-[dot_1.2s_ease-in-out_.3s_infinite]" />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      </Reveal>
     </div>
   );
 }
 
-/* ---------- Floating WhatsApp button (after hero) ---------- */
+/* ---------- Floating WhatsApp ---------- */
 
 function FloatingWA() {
   const [show, setShow] = useState(false);
@@ -233,6 +373,52 @@ function FloatingWA() {
     >
       <MessageCircle className="w-6 h-6" strokeWidth={1.75} />
     </a>
+  );
+}
+
+/* ---------- Green "See it work" reveal button ---------- */
+
+function SeeItWorkButton({
+  onArm,
+  className = "",
+}: {
+  onArm: () => void;
+  className?: string;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [bounced, setBounced] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting && !bounced) {
+          setBounced(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.6 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [bounced]);
+  return (
+    <button
+      ref={ref}
+      onClick={(e) => {
+        e.preventDefault();
+        onArm();
+        document
+          .getElementById("demo")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }}
+      className={`relative inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-medium text-white transition-all duration-150 hover:-translate-y-0.5 motion-safe:animate-[glow_3s_ease-in-out_infinite] ${
+        bounced ? "motion-safe:animate-[softBounce_.9s_ease-out_1]" : ""
+      } ${className}`}
+      style={{ backgroundColor: "#25D366" }}
+    >
+      See it work
+    </button>
   );
 }
 
@@ -281,14 +467,29 @@ const faqs = [
 
 function Landing() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [bloomed, setBloomed] = useState(false);
+  const soundArmedRef = useRef(false);
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* Local keyframes */}
+    <div
+      className={`min-h-screen bg-background text-foreground overflow-x-hidden ${
+        bloomed ? "bloomed" : ""
+      }`}
+    >
       <style>{`
         @keyframes fadeRise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes dot { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-2px); } }
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+        @keyframes glow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.35), 0 10px 30px -12px rgba(37,211,102,0.5); }
+          50% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0), 0 14px 34px -12px rgba(37,211,102,0.65); }
+        }
+        @keyframes softBounce {
+          0% { transform: translateY(0); }
+          40% { transform: translateY(-6px); }
+          70% { transform: translateY(-2px); }
+          100% { transform: translateY(0); }
+        }
       `}</style>
 
       {/* Nav */}
@@ -315,12 +516,12 @@ function Landing() {
         </div>
       </header>
 
-      {/* 1. Hero — full-bleed */}
+      {/* 1. Hero */}
       <section className="relative h-screen min-h-[640px] w-full overflow-hidden">
         <img
           src={heroImg}
           alt="A calm, softly lit home interior"
-          className="absolute inset-0 w-full h-full object-cover grayscale"
+          className="absolute inset-0 w-full h-full object-cover duotone"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent" />
         <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-10 flex items-end md:items-center">
@@ -339,12 +540,11 @@ function Landing() {
               >
                 Check if my home qualifies
               </PillLink>
-              <a
-                href="#how"
-                className="text-sm text-white/80 hover:text-white underline underline-offset-4 decoration-white/40 hover:decoration-white transition self-start sm:self-auto"
-              >
-                See how it works
-              </a>
+              <SeeItWorkButton
+                onArm={() => {
+                  soundArmedRef.current = true;
+                }}
+              />
             </div>
           </div>
         </div>
@@ -399,38 +599,25 @@ function Landing() {
         </div>
       </section>
 
-      {/* 4. WhatsApp demonstration */}
-      <section className="py-28 md:py-36 px-6">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-          <Reveal>
-            <div className="rounded-[2.5rem] overflow-hidden shadow-float">
-              <img
-                src={homeImg}
-                alt="A calm morning routine at home"
-                loading="lazy"
-                className="w-full h-full object-cover aspect-[4/5] grayscale"
-              />
-            </div>
+      {/* 4. Demo */}
+      <section id="demo" className="py-28 md:py-36 px-6">
+        <div className="max-w-6xl mx-auto space-y-14">
+          <Reveal className="max-w-2xl">
+            <h2 className="text-4xl md:text-5xl leading-tight">
+              A conversation, not a control panel.
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-md mt-4">
+              Control your geyser the same way you'd ask someone at home.
+            </p>
           </Reveal>
-          <div className="space-y-10">
-            <Reveal>
-              <div className="space-y-4">
-                <h2 className="text-4xl md:text-5xl leading-tight">
-                  A conversation, not a control panel.
-                </h2>
-                <p className="text-lg text-muted-foreground max-w-md">
-                  Control your geyser the same way you'd ask someone at home.
-                </p>
-              </div>
-            </Reveal>
-            <Reveal delay={100}>
-              <WhatsAppDemo />
-            </Reveal>
-          </div>
+          <DemoBlock
+            onBloom={() => setBloomed(true)}
+            soundArmedRef={soundArmedRef}
+          />
         </div>
       </section>
 
-      {/* 5. Benefits — three grouped statements */}
+      {/* 5. Benefits */}
       <section id="benefits" className="py-28 md:py-36 px-6 bg-secondary/40">
         <div className="max-w-5xl mx-auto space-y-24 md:space-y-32">
           {[
@@ -521,7 +708,7 @@ function Landing() {
                 src={electricianImg}
                 alt="Certified electrician beside a tidy distribution board"
                 loading="lazy"
-                className="w-full h-full object-cover aspect-[4/5] grayscale transition-transform duration-[1200ms] ease-out hover:scale-[1.03]"
+                className="w-full h-full object-cover aspect-[4/5] duotone transition-transform duration-[1200ms] ease-out hover:scale-[1.03]"
               />
             </div>
           </Reveal>
@@ -548,17 +735,12 @@ function Landing() {
         </div>
       </section>
 
-      {/* 9. Pricing — dark, full-width */}
+      {/* 9. Pricing */}
       <section id="pricing" className="py-28 md:py-36 px-6 bg-primary text-primary-foreground">
         <div className="max-w-3xl mx-auto text-center space-y-10">
           <Reveal>
-            <div className="space-y-3">
-              <div className="text-xs uppercase tracking-[0.3em] text-primary-foreground/60">
-                Founding 10 homes
-              </div>
-              <div className="text-sm text-primary-foreground/70">
-                {SPOTS_TAKEN} of 10 spots taken
-              </div>
+            <div className="text-xs uppercase tracking-[0.3em] text-primary-foreground/60">
+              First 10 homes only
             </div>
           </Reveal>
           <Reveal delay={80}>
@@ -589,7 +771,7 @@ function Landing() {
           </Reveal>
           <Reveal delay={200}>
             <PillLink href={wa("GEYSER")} variant="light">
-              Join the Founding 10
+              Get started
             </PillLink>
           </Reveal>
         </div>
@@ -642,13 +824,13 @@ function Landing() {
         </div>
       </section>
 
-      {/* 11. Final — full-bleed */}
+      {/* 11. Final */}
       <section className="relative h-[85vh] min-h-[560px] w-full overflow-hidden">
         <img
           src={homeImg}
           alt="A modern home in soft light"
           loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover grayscale"
+          className="absolute inset-0 w-full h-full object-cover duotone"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/20" />
         <div className="relative z-10 h-full flex items-center justify-center px-6">
