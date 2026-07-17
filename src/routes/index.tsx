@@ -1014,18 +1014,22 @@ function Landing() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/20" />
         <div className="relative z-10 h-full flex items-center justify-center px-6">
-          <div className="text-center text-white space-y-8 max-w-2xl">
-            <h2 className="text-5xl md:text-7xl tracking-tight leading-[1.02]">
+          <div className="text-center text-white space-y-6 md:space-y-8 max-w-2xl">
+            <h2 className="text-4xl sm:text-5xl md:text-7xl tracking-tight leading-[1.05]">
               Switch off the work.<br />
               <span className="italic text-white/85">Switch on soft life.</span>
             </h2>
-            <p className="text-lg text-white/80 max-w-md mx-auto">
+            <p className="text-base md:text-lg text-white/80 max-w-md mx-auto">
               Your home handles the routine. You enjoy the comfort.
             </p>
             <div className="pt-2 flex justify-center">
-              <PillLink href={wa("GEYSER")} variant="light">
+              <button
+                type="button"
+                onClick={() => document.getElementById("qualifies")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
+              >
                 Check if my home qualifies
-              </PillLink>
+              </button>
             </div>
           </div>
         </div>
@@ -1035,7 +1039,7 @@ function Landing() {
       <footer className="py-12 px-6 border-t border-border/60">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-primary" />
+            <img src={logoAsset.url} alt="GeyserBrain" className="h-7 w-auto" />
             <span className="text-foreground font-medium">GeyserBrain</span>
           </div>
           <div className="flex items-center gap-6">
