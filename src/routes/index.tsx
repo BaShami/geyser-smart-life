@@ -109,8 +109,44 @@ const SCRIPT: Msg[] = [
   { from: "me", text: "Can you have it ready every weekday at 6am too?" },
   { from: "them", text: "Got it — set for every weekday at 6am." },
 ];
-// Index of the "reaction moment" message.
+const TIMES = ["09:41", "09:41", "09:42", "09:42", "09:43", "09:43"];
 const REACTION_MSG_INDEX = 3;
+
+type Step =
+  | { type: "delay"; ms: number }
+  | { type: "typing"; on: boolean }
+  | { type: "send"; index: number };
+
+function buildSteps(): Step[] {
+  const s: Step[] = [];
+  SCRIPT.forEach((m, i) => {
+    if (m.from === "them") {
+      s.push({ type: "delay", ms: 500 });
+      s.push({ type: "typing", on: true });
+      s.push({ type: "delay", ms: 900 });
+      s.push({ type: "typing", on: false });
+    }
+    s.push({ type: "delay", ms: 300 });
+    s.push({ type: "send", index: i });
+    s.push({ type: "delay", ms: 900 });
+  });
+  return s;
+}
+const STEPS = buildSteps();
+
+function DoubleCheck({ read }: { read: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 16 15"
+      className={`w-[14px] h-[10px] ${read ? "text-[#53BDEB]" : "text-neutral-400"}`}
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M10.91 3.316l-.478-.372a.365.365 0 00-.51.063L4.566 9.879a.32.32 0 01-.484.033L1.891 7.769a.366.366 0 00-.515.006l-.423.433a.364.364 0 00.006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 00-.063-.51z" />
+      <path d="M15.61 3.316l-.478-.372a.365.365 0 00-.51.063L9.32 9.879a.32.32 0 01-.484.033l-.358-.325a.365.365 0 00-.484.032l-.372.472a.364.364 0 00.032.516l1.19 1.081c.144.14.362.125.484-.033l6.272-8.048a.365.365 0 00-.064-.51z" />
+    </svg>
+  );
+}
 
 function DemoBlock({
   onBloom,
@@ -121,32 +157,158 @@ function DemoBlock({
 }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [visible, setVisible] = useState<Msg[]>([]);
+
+  const [visibleIdx, setVisibleIdx] = useState<number[]>([]);
   const [typing, setTyping] = useState(false);
-  const [started, setStarted] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [finished, setFinished] = useState(false);
   const [muted, setMuted] = useState(true);
   const [showCaption, setShowCaption] = useState(false);
+  const [bloomedLocal, setBloomedLocal] = useState(false);
   const [reduce, setReduce] = useState(false);
+
+  const stepIRef = useRef(0);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerStartedAtRef = useRef(0);
+  const timerRemainingRef = useRef(0);
+  const startedOnceRef = useRef(false);
   const bloomedRef = useRef(false);
 
   const triggerBloom = useCallback(() => {
     if (bloomedRef.current) return;
     bloomedRef.current = true;
+    setBloomedLocal(true);
     setShowCaption(true);
     onBloom();
   }, [onBloom]);
 
-  // Start on scroll into view
+  const clearTimer = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  const runStep = useCallback(() => {
+    while (stepIRef.current < STEPS.length) {
+      const step = STEPS[stepIRef.current++];
+      if (step.type === "typing") {
+        setTyping(step.on);
+        continue;
+      }
+      if (step.type === "send") {
+        const idx = step.index;
+        setVisibleIdx((v) => (v.includes(idx) ? v : [...v, idx]));
+        if (idx === REACTION_MSG_INDEX) {
+          const v = videoRef.current;
+          if (v) {
+            const armed = soundArmedRef.current;
+            v.muted = !armed;
+            setMuted(!armed);
+            v.play().catch(() => {
+              v.muted = true;
+              setMuted(true);
+              v.play().catch(() => {});
+            });
+          }
+          if (REACTION_TIMESTAMP == null) triggerBloom();
+        }
+        continue;
+      }
+      // delay
+      timerStartedAtRef.current = Date.now();
+      timerRemainingRef.current = step.ms;
+      timerRef.current = setTimeout(runStep, step.ms);
+      return;
+    }
+    // Done
+    setPlaying(false);
+    setFinished(true);
+    setTyping(false);
+    const v = videoRef.current;
+    if (v && !v.paused) {
+      // let video finish naturally; don't force pause
+    }
+  }, [soundArmedRef, triggerBloom]);
+
+  const startSequence = useCallback(() => {
+    clearTimer();
+    stepIRef.current = 0;
+    setVisibleIdx([]);
+    setTyping(false);
+    setFinished(false);
+    setPlaying(true);
+    runStep();
+  }, [runStep]);
+
+  const pauseAll = useCallback(() => {
+    clearTimer();
+    timerRemainingRef.current = Math.max(
+      0,
+      timerRemainingRef.current - (Date.now() - timerStartedAtRef.current),
+    );
+    videoRef.current?.pause();
+    setPlaying(false);
+  }, []);
+
+  const resumeAll = useCallback(() => {
+    setPlaying(true);
+    const v = videoRef.current;
+    if (v && v.currentTime > 0 && !v.ended) v.play().catch(() => {});
+    if (timerRemainingRef.current > 0) {
+      timerStartedAtRef.current = Date.now();
+      timerRef.current = setTimeout(runStep, timerRemainingRef.current);
+    } else {
+      runStep();
+    }
+  }, [runStep]);
+
+  const replayAll = useCallback(() => {
+    const v = videoRef.current;
+    if (v) {
+      try {
+        v.currentTime = 0.01;
+      } catch {}
+      v.pause();
+    }
+    startSequence();
+  }, [startSequence]);
+
+  const togglePlay = () => {
+    if (finished) {
+      replayAll();
+      return;
+    }
+    if (playing) pauseAll();
+    else resumeAll();
+  };
+
+  // Start ONCE when scrolled into view
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
     const io = new IntersectionObserver(
-      ([e]) => e.isIntersecting && setStarted(true),
-      { threshold: 0.3 },
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        if (startedOnceRef.current) return;
+        startedOnceRef.current = true;
+        if (reduce) {
+          setVisibleIdx(SCRIPT.map((_, i) => i));
+          setFinished(true);
+          triggerBloom();
+          return;
+        }
+        startSequence();
+      },
+      { threshold: 0.35 },
     );
     io.observe(el);
     return () => io.disconnect();
-  }, []);
+  }, [reduce, startSequence, triggerBloom]);
+
+  // Cleanup on unmount
+  useEffect(() => () => clearTimer(), []);
 
   // Motion preference
   useEffect(() => {
@@ -157,74 +319,15 @@ function DemoBlock({
     return () => m.removeEventListener?.("change", handler);
   }, []);
 
-  // Prime video: hold at first frame until reaction message
+  // Prime video first frame
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     v.muted = true;
-    // Load first frame
     try {
       v.currentTime = 0.01;
     } catch {}
   }, []);
-
-  // Message sequence
-  useEffect(() => {
-    if (!started) return;
-    if (reduce) {
-      setVisible(SCRIPT);
-      triggerBloom();
-      return;
-    }
-    let cancelled = false;
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    const wait = (ms: number) =>
-      new Promise<void>((r) => {
-        const t = setTimeout(r, ms);
-        timers.push(t);
-      });
-
-    const run = async () => {
-      for (let i = 0; i < SCRIPT.length; i++) {
-        const msg = SCRIPT[i];
-        if (msg.from === "them") {
-          await wait(500);
-          if (cancelled) return;
-          setTyping(true);
-          await wait(900);
-          if (cancelled) return;
-          setTyping(false);
-        }
-        await wait(300);
-        if (cancelled) return;
-        setVisible((v) => [...v, msg]);
-
-        // Reaction moment: play video (and, if no explicit timestamp, bloom now)
-        if (i === REACTION_MSG_INDEX) {
-          const v = videoRef.current;
-          if (v) {
-            const armed = soundArmedRef.current;
-            v.muted = !armed;
-            setMuted(!armed);
-            v.play().catch(() => {
-              // Autoplay blocked with sound; retry muted
-              v.muted = true;
-              setMuted(true);
-              v.play().catch(() => {});
-            });
-          }
-          if (REACTION_TIMESTAMP == null) triggerBloom();
-        }
-
-        await wait(900);
-      }
-    };
-    run();
-    return () => {
-      cancelled = true;
-      timers.forEach(clearTimeout);
-    };
-  }, [started, reduce, triggerBloom, soundArmedRef]);
 
   // Timestamp-based bloom
   useEffect(() => {
@@ -247,40 +350,28 @@ function DemoBlock({
     const next = !muted;
     v.muted = next;
     setMuted(next);
-    if (!next) v.play().catch(() => {});
+    if (!next && v.currentTime > 0 && !v.ended) v.play().catch(() => {});
   };
 
-  const manualPlay = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.play().catch(() => {});
-  };
+  const lastThemVisible = Math.max(
+    -1,
+    ...visibleIdx.filter((i) => SCRIPT[i].from === "them"),
+  );
 
   return (
-    <div
-      ref={sectionRef}
-      className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center"
-    >
-      {/* Video */}
-      <Reveal>
-        <div className="relative rounded-[2.5rem] overflow-hidden shadow-float bg-black aspect-[4/5]">
-          <video
-            ref={videoRef}
-            src={reactionVideo.url}
-            preload="metadata"
-            playsInline
-            muted
-            className="w-full h-full object-cover duotone"
-          />
-          {reduce ? (
-            <button
-              onClick={manualPlay}
-              aria-label="Play reaction video"
-              className="absolute inset-0 flex items-center justify-center bg-black/20 text-white"
-            >
-              <Play className="w-12 h-12" strokeWidth={1.5} />
-            </button>
-          ) : (
+    <div ref={sectionRef} className="space-y-8">
+      <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        {/* Video */}
+        <Reveal>
+          <div className="relative rounded-[2.5rem] overflow-hidden shadow-float bg-black aspect-[4/5]">
+            <video
+              ref={videoRef}
+              src={reactionVideo.url}
+              preload="metadata"
+              playsInline
+              muted
+              className="w-full h-full object-cover duotone"
+            />
             <button
               onClick={toggleMute}
               aria-label={muted ? "Unmute video" : "Mute video"}
@@ -292,63 +383,140 @@ function DemoBlock({
                 <Volume2 className="w-4 h-4" strokeWidth={1.75} />
               )}
             </button>
+          </div>
+        </Reveal>
+
+        {/* Chat + floating caption */}
+        <Reveal delay={80}>
+          <div className="relative">
+            <div
+              className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-4 md:-top-6 z-10 transition-all duration-[550ms] ease-out ${
+                showCaption ? "opacity-100 -translate-y-1" : "opacity-0 translate-y-2"
+              }`}
+            >
+              <div className="rounded-full bg-card/90 backdrop-blur border border-border/60 shadow-soft px-5 py-2 text-sm font-medium">
+                It's heating now.
+              </div>
+            </div>
+
+            <div
+              className={`rounded-[2rem] shadow-float overflow-hidden border border-border/40 max-w-md mx-auto transition-[filter] duration-[900ms] ease-out ${
+                bloomedLocal ? "" : "duotone"
+              }`}
+              style={{ backgroundColor: "#ECE5DD" }}
+            >
+              {/* WhatsApp header */}
+              <div
+                className="px-4 py-3 flex items-center gap-3"
+                style={{ backgroundColor: "#075E54", color: "white" }}
+              >
+                <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white font-semibold">
+                  G
+                </div>
+                <div className="min-w-0">
+                  <div className="font-semibold text-[15px] leading-tight">GeyserBrain</div>
+                  <div className="text-[12px] leading-tight text-white/80 h-[16px]">
+                    {typing ? "typing…" : "online"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Chat body */}
+              <div
+                className="px-4 py-5 space-y-1.5 min-h-[440px]"
+                style={{
+                  backgroundColor: "#ECE5DD",
+                  backgroundImage:
+                    "radial-gradient(oklch(0 0 0 / 0.04) 1px, transparent 1px)",
+                  backgroundSize: "14px 14px",
+                }}
+              >
+                {visibleIdx.map((idx) => {
+                  const m = SCRIPT[idx];
+                  const isMe = m.from === "me";
+                  const read = isMe && idx < lastThemVisible;
+                  return (
+                    <div
+                      key={idx}
+                      className={`flex ${isMe ? "justify-end" : "justify-start"} animate-[fadeRise_.45s_ease-out_both]`}
+                    >
+                      <div
+                        className={`relative max-w-[78%] px-3 pt-2 pb-[6px] text-[14.5px] leading-snug shadow-[0_1px_0.5px_rgba(0,0,0,0.13)] ${
+                          isMe
+                            ? "rounded-2xl rounded-br-[4px] text-neutral-900"
+                            : "rounded-2xl rounded-bl-[4px] text-neutral-900"
+                        }`}
+                        style={{
+                          backgroundColor: isMe ? "#DCF8C6" : "#FFFFFF",
+                        }}
+                      >
+                        <span className="pr-14">{m.text}</span>
+                        <span className="absolute bottom-1 right-2 flex items-center gap-1 text-[10.5px] text-neutral-500 leading-none">
+                          <span>{TIMES[idx]}</span>
+                          {isMe && <DoubleCheck read={read} />}
+                        </span>
+                        {/* Tail */}
+                        <span
+                          aria-hidden
+                          className={`absolute bottom-0 w-2 h-2 ${
+                            isMe ? "-right-1" : "-left-1"
+                          }`}
+                          style={{
+                            backgroundColor: isMe ? "#DCF8C6" : "#FFFFFF",
+                            clipPath: isMe
+                              ? "polygon(0 0, 100% 100%, 0 100%)"
+                              : "polygon(100% 0, 100% 100%, 0 100%)",
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+                {typing && (
+                  <div className="flex justify-start">
+                    <div
+                      className="rounded-2xl rounded-bl-[4px] px-4 py-3 flex gap-1 shadow-[0_1px_0.5px_rgba(0,0,0,0.13)]"
+                      style={{ backgroundColor: "#FFFFFF" }}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-[dot_1.2s_ease-in-out_infinite]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-[dot_1.2s_ease-in-out_.15s_infinite]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-[dot_1.2s_ease-in-out_.3s_infinite]" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+
+      {/* Shared play / pause / replay control */}
+      <div className="flex justify-center">
+        <button
+          onClick={togglePlay}
+          aria-label={
+            finished ? "Replay demo" : playing ? "Pause demo" : "Play demo"
+          }
+          className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card px-5 py-2.5 text-sm font-medium text-foreground shadow-soft hover:-translate-y-0.5 hover:shadow-float transition-all"
+        >
+          {finished ? (
+            <>
+              <RotateCcw className="w-4 h-4" strokeWidth={1.9} />
+              Replay
+            </>
+          ) : playing ? (
+            <>
+              <Pause className="w-4 h-4" strokeWidth={1.9} />
+              Pause
+            </>
+          ) : (
+            <>
+              <Play className="w-4 h-4" strokeWidth={1.9} />
+              Play
+            </>
           )}
-        </div>
-      </Reveal>
-
-      {/* Chat + floating caption */}
-      <Reveal delay={80}>
-        <div className="relative">
-          <div
-            className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-4 md:-top-6 z-10 transition-all duration-[550ms] ease-out ${
-              showCaption ? "opacity-100 -translate-y-1" : "opacity-0 translate-y-2"
-            }`}
-          >
-            <div className="rounded-full bg-white/90 backdrop-blur border border-border/60 shadow-soft px-5 py-2 text-sm font-medium">
-              It's heating now.
-            </div>
-          </div>
-
-          <div className="rounded-[2.5rem] bg-white shadow-float overflow-hidden border border-border/40 max-w-md mx-auto">
-            <div className="bg-secondary/60 px-6 py-4 flex items-center gap-3 border-b border-border/40">
-              <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                <MessageCircle className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="font-medium text-sm">GeyserBrain</div>
-                <div className="text-xs text-muted-foreground">online</div>
-              </div>
-            </div>
-            <div className="p-6 space-y-3 bg-[oklch(0.98_0_0)] min-h-[420px]">
-              {visible.map((m, i) => (
-                <div
-                  key={i}
-                  className={`flex ${m.from === "me" ? "justify-end" : "justify-start"} animate-[fadeRise_.55s_ease-out_both]`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-3xl px-5 py-3 text-sm ${
-                      m.from === "me"
-                        ? "bg-primary text-primary-foreground rounded-br-lg"
-                        : "bg-white text-foreground rounded-bl-lg shadow-sm border border-border/40"
-                    }`}
-                  >
-                    {m.text}
-                  </div>
-                </div>
-              ))}
-              {typing && (
-                <div className="flex justify-start">
-                  <div className="bg-white rounded-3xl rounded-bl-lg shadow-sm border border-border/40 px-5 py-3 flex gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-[dot_1.2s_ease-in-out_infinite]" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-[dot_1.2s_ease-in-out_.15s_infinite]" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-[dot_1.2s_ease-in-out_.3s_infinite]" />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </Reveal>
+        </button>
+      </div>
     </div>
   );
 }
