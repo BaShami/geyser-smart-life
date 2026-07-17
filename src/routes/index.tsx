@@ -702,7 +702,7 @@ function Landing() {
             </h1>
             <p className="text-lg md:text-xl text-white/85 max-w-lg leading-relaxed whitespace-pre-line">
               Talk to your home on WhatsApp.&nbsp;
-              {"\n"}Manage your electricity through natural language and when you need it. No new app, no manual — just talk..
+              {"\n"}Manage your electricity through natural language, when you need it. No new app, no manual — just talk...
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-2">
               <PillLink
