@@ -666,12 +666,12 @@ function Landing() {
       `}</style>
 
       {/* Nav */}
-      <header className="fixed top-4 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-5xl">
-        <div className="rounded-full bg-white/70 backdrop-blur-xl border border-border/60 shadow-soft px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-medium">
-            <div className="w-7 h-7 rounded-full bg-primary" />
-            <span>GeyserBrain</span>
-          </div>
+      <header className="fixed top-3 md:top-4 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-5xl">
+        <div className="rounded-full bg-white/70 backdrop-blur-xl border border-border/60 shadow-soft pl-3 pr-3 md:pl-5 md:pr-5 py-2 md:py-3 flex items-center justify-between gap-3">
+          <a href="#" className="flex items-center gap-2 font-medium min-w-0">
+            <img src={logoAsset.url} alt="GeyserBrain" className="h-7 md:h-8 w-auto shrink-0" />
+            <span className="hidden sm:inline truncate">GeyserBrain</span>
+          </a>
           <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
             <a href="#how" className="hover:text-foreground transition">How it works</a>
             <a href="#benefits" className="hover:text-foreground transition">Benefits</a>
@@ -682,7 +682,7 @@ function Landing() {
             href={wa("GEYSER")}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-5 py-2 text-xs font-medium hover:opacity-90 transition"
+            className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-4 md:px-5 py-2 text-xs font-medium hover:opacity-90 transition shrink-0"
           >
             Message us
           </a>
