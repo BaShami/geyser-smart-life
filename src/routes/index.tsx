@@ -690,30 +690,30 @@ function Landing() {
       </header>
 
       {/* 1. Hero */}
-      <section className="relative h-screen min-h-[640px] w-full overflow-hidden">
+      <section className="relative h-[100svh] min-h-[560px] w-full overflow-hidden">
         <img
           src={heroImg}
           alt="A calm, softly lit home interior"
           className="absolute inset-0 w-full h-full object-cover duotone"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent md:from-black/60 md:via-black/25" />
         <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-10 flex items-end md:items-center">
-          <div className="pb-16 md:pb-0 max-w-2xl text-white space-y-6">
-            <h1 className="text-5xl md:text-7xl leading-[0.95] tracking-tight">
+          <div className="pb-20 md:pb-0 max-w-2xl text-white space-y-5 md:space-y-6">
+            <h1 className="text-[2.75rem] leading-[1] sm:text-6xl md:text-7xl tracking-tight">
               Smart home.<br />
               <span className="italic text-white/80">Soft life.</span>
             </h1>
-            <p className="text-lg md:text-xl text-white/85 max-w-lg leading-relaxed whitespace-pre-line">
-              Talk to your home on WhatsApp.&nbsp;
-              {"\n"}Manage your electricity through natural language, when you need it. No new app, no manual — just talk...
+            <p className="text-base sm:text-lg md:text-xl text-white/85 max-w-lg leading-relaxed">
+              Talk to your home on WhatsApp. Manage your electricity through natural language, when you need it. No new app, no manual — just talk.
             </p>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-2">
-              <PillLink
-                href={wa("Hi, I'd like to check if my home qualifies for GeyserBrain")}
-                variant="light"
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
+              <button
+                type="button"
+                onClick={() => document.getElementById("qualifies")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
               >
                 Check if my home qualifies
-              </PillLink>
+              </button>
               <SeeItWorkButton
                 onArm={() => {
                   soundArmedRef.current = true;
