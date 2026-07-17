@@ -4,6 +4,8 @@ import { Check, ChevronDown, MessageCircle, Volume2, VolumeX, Play } from "lucid
 import heroImg from "@/assets/hero.jpg";
 import electricianImg from "@/assets/electrician.jpg";
 import homeImg from "@/assets/home.jpg";
+import reactionVideo from "@/assets/reaction.mp4.asset.json";
+
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -264,7 +266,7 @@ function DemoBlock({
         <div className="relative rounded-[2.5rem] overflow-hidden shadow-float bg-black aspect-[4/5]">
           <video
             ref={videoRef}
-            src="/reaction.mp4"
+            src={reactionVideo.url}
             preload="metadata"
             playsInline
             muted
