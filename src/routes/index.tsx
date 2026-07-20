@@ -569,14 +569,21 @@ function SeeItWorkButton({ onArm, className = "" }: { onArm: () => void; classNa
 
 /* ---------- FAQ ---------- */
 
-const faqs = [
+type Faq = { q: string; a: string; action?: "waitlist" };
+
+const faqs: Faq[] = [
   {
     q: "Do I need to download an app?",
     a: "No. GeyserBrain works entirely through WhatsApp — the app you already have. Save the number and message it like you'd message anyone else.",
   },
   {
-    q: "Will it work with my existing geyser?",
-    a: "Most standard electric geysers are supported. We check your home before installation to confirm compatibility.",
+    q: "Which devices does it work with today?",
+    a: "We're a smart home company at heart. Today, that means your geyser — your home's biggest electricity cost. More devices are on our roadmap.",
+  },
+  {
+    q: "Is this available where I am?",
+    a: "We're expanding steadily. Message us and we'll confirm availability for your area — if we're not there yet, we'll add you to the waitlist.",
+    action: "waitlist",
   },
   {
     q: "How long does installation take?",
