@@ -6,6 +6,7 @@ import electricianImg from "@/assets/electrician.jpg";
 import homeImg from "@/assets/home.jpg";
 import reactionVideo from "@/assets/reaction.mp4.asset.json";
 import logoAsset from "@/assets/geyserbrain-logo.png.asset.json";
+import { QualifyChat } from "@/components/QualifyChat";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -612,7 +613,15 @@ const faqs = [
 function Landing() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [bloomed, setBloomed] = useState(false);
+  const [chatActive, setChatActive] = useState(false);
   const soundArmedRef = useRef(false);
+
+  const openQualifyChat = () => {
+    setChatActive(true);
+    setTimeout(() => {
+      document.getElementById("qualify-chat")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 60);
+  };
 
   return (
     <div className={`min-h-screen bg-background text-foreground overflow-x-hidden ${bloomed ? "bloomed" : ""}`}>
@@ -686,9 +695,7 @@ function Landing() {
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
               <button
                 type="button"
-                onClick={() =>
-                  document.getElementById("qualifies")?.scrollIntoView({ behavior: "smooth", block: "start" })
-                }
+                onClick={openQualifyChat}
                 className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
               >
                 Check if my home qualifies
@@ -742,11 +749,23 @@ function Landing() {
           </Reveal>
           <Reveal delay={260}>
             <div className="mt-8 pl-10">
-              <PillLink href={wa("Hi, I'd like to check if my home qualifies for GeyserBrain")}>
-                Message us to check
-              </PillLink>
+              {!chatActive ? (
+                <button
+                  type="button"
+                  onClick={openQualifyChat}
+                  className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
+                >
+                  Chat with us to check
+                </button>
+              ) : null}
             </div>
           </Reveal>
+
+          {chatActive && (
+            <div id="qualify-chat" className="mt-12 max-w-xl mx-auto scroll-mt-24">
+              <QualifyChat active={chatActive} />
+            </div>
+          )}
         </div>
       </section>
 
@@ -983,9 +1002,7 @@ function Landing() {
             <div className="pt-2 flex justify-center">
               <button
                 type="button"
-                onClick={() =>
-                  document.getElementById("qualifies")?.scrollIntoView({ behavior: "smooth", block: "start" })
-                }
+                onClick={openQualifyChat}
                 className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
               >
                 Check if my home qualifies
