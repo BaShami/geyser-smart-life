@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
+import { sendTemplateEmail } from "@/lib/email-templates/send-email";
 
 type Role = "user" | "assistant";
 type Msg = { role: Role; content: string };
@@ -115,56 +116,19 @@ async function sendNotifyEmail(payload: {
   name: string | null;
   contact: string | null;
   city: string | null;
+  hasGeyser: boolean | null;
+  hasWifi: boolean | null;
+  isRenter: boolean | null;
   transcript: Msg[];
 }) {
-  const key = process.env.LOVABLE_API_KEY;
-  if (!key) return;
-  const body = {
-    to: NOTIFY_EMAIL,
-    subject: `New GeyserBrain lead: ${payload.name ?? "unnamed"} (${payload.city ?? "?"})`,
-    html: `<div style="font-family:Inter,Arial,sans-serif;color:#111">
-      <h2 style="margin:0 0 12px">New qualified lead</h2>
-      <p><b>Name:</b> ${payload.name ?? "(not given)"}<br/>
-      <b>Contact:</b> ${payload.contact ?? "(not given)"}<br/>
-      <b>City:</b> ${payload.city ?? "(unknown)"}</p>
-      <h3 style="margin:20px 0 8px">Transcript</h3>
-      <div style="border:1px solid #eee;border-radius:8px;padding:12px;background:#fafafa">
-        ${payload.transcript
-          .map(
-            (m) =>
-              `<p style="margin:6px 0"><b>${m.role === "user" ? "Visitor" : "Bot"}:</b> ${escapeHtml(
-                m.content,
-              )}</p>`,
-          )
-          .join("")}
-      </div>
-    </div>`,
-  };
   try {
-    // Managed Lovable email endpoint. Requires an email domain to be configured
-    // in the project — until then it will return an error and we log silently.
-    const res = await fetch("https://api.lovable.dev/v1/emails/send", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${key}`,
-      },
-      body: JSON.stringify(body),
+    await sendTemplateEmail("lead-notification", NOTIFY_EMAIL, {
+      templateData: payload,
+      idempotencyKey: `lead-${payload.contact ?? payload.name ?? crypto.randomUUID()}-${Date.now()}`,
     });
-    if (!res.ok) {
-      console.warn("[qualify] notify email failed", res.status, await res.text().catch(() => ""));
-    }
   } catch (err) {
     console.warn("[qualify] notify email error", err);
   }
-}
-
-function escapeHtml(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }
 
 export const Route = createFileRoute("/api/qualify")({
