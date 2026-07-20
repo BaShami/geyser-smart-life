@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>GeyserBrain Promo — Landscape</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/TextPlugin.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0e3a43;
+      }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+      .stage-fill {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(ellipse 55% 70% at 50% 40%, rgba(232, 161, 58, 0.16), transparent 60%),
+          radial-gradient(ellipse 50% 60% at 78% 70%, rgba(200, 69, 31, 0.14), transparent 55%),
+          #0e3a43;
+      }
+      .chat-scene,
+      .end-scene {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .phone {
+        width: 420px;
+        height: 860px;
+        border-radius: 42px;
+        background: #111b21;
+        border: 3px solid rgba(233, 237, 239, 0.12);
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.45),
+          0 0 0 8px rgba(14, 58, 67, 0.35);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .phone-notch {
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 22px;
+        background: #000;
+        border-radius: 16px;
+        z-index: 5;
+      }
+      .status-bar {
+        height: 52px;
+        padding: 22px 26px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #e9edef;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .wa-header {
+        height: 72px;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: #1f2c34;
+        border-bottom: 1px solid rgba(233, 237, 239, 0.06);
+      }
+      .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #e8a13a, #c8451f);
+        display: grid;
+        place-items: center;
+        color: #0e3a43;
+        font-family: "EB Garamond", Georgia, "Times New Roman", serif;
+        font-size: 22px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .header-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+      }
+      .header-name {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 20px;
+        font-weight: 600;
+        color: #e9edef;
+      }
+      .header-status {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 14px;
+        color: #e8a13a;
+      }
+      .messages {
+        flex: 1;
+        background: #0b141a;
+        padding: 24px 18px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        position: relative;
+      }
+      .messages::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 20% 10%, rgba(232, 161, 58, 0.05), transparent 40%),
+          radial-gradient(circle at 80% 90%, rgba(200, 69, 31, 0.05), transparent 45%);
+        pointer-events: none;
+      }
+      .row {
+        display: flex;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+      }
+      .row.in {
+        justify-content: flex-start;
+      }
+      .row.out {
+        justify-content: flex-end;
+      }
+      .bubble {
+        max-width: 88%;
+        padding: 14px 16px 12px;
+        border-radius: 14px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 18px;
+        line-height: 1.35;
+        color: #e9edef;
+        position: relative;
+      }
+      .bubble.in {
+        background: #202c33;
+        border-top-left-radius: 4px;
+      }
+      .bubble.out {
+        background: #005c4b;
+        border-top-right-radius: 4px;
+      }
+      .bubble-time {
+        display: block;
+        margin-top: 8px;
+        text-align: right;
+        font-size: 12px;
+        color: #8696a0;
+        font-weight: 500;
+      }
+      .bubble.out .bubble-time {
+        color: #c8e6df;
+      }
+      .typed {
+        white-space: pre-wrap;
+      }
+      .cursor {
+        display: inline-block;
+        width: 2px;
+        height: 1em;
+        margin-left: 2px;
+        background: #e8a13a;
+        vertical-align: -2px;
+        opacity: 0;
+      }
+      .composer {
+        height: 64px;
+        background: #1f2c34;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        gap: 12px;
+      }
+      .composer-pill {
+        flex: 1;
+        height: 40px;
+        border-radius: 20px;
+        background: #2a3942;
+        color: #c5cdd3;
+        display: flex;
+        align-items: center;
+        padding: 0 18px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 15px;
+      }
+      .send-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e8a13a;
+        display: grid;
+        place-items: center;
+        color: #0e3a43;
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .side-brand {
+        position: absolute;
+        left: 96px;
+        top: 0;
+        bottom: 0;
+        width: 420px;
+        opacity: 0.22;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .side-brand .wordmark {
+        font-size: 64px;
+        text-align: left;
+      }
+      .side-brand .tagline {
+        margin-top: 16px;
+        font-size: 24px;
+        text-align: left;
+      }
+      .brand-block {
+        text-align: center;
+        padding: 40px;
+        max-width: 1100px;
+      }
+      .wordmark {
+        font-family: "EB Garamond", Georgia, "Times New Roman", serif;
+        font-size: 88px;
+        font-weight: 700;
+        color: #e9edef;
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+      }
+      .wordmark span {
+        color: #e8a13a;
+      }
+      .underline {
+        width: 200px;
+        height: 5px;
+        margin: 24px auto 0;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #e8a13a, #c8451f);
+        transform-origin: left center;
+      }
+      .tagline {
+        margin-top: 28px;
+        font-family: "EB Garamond", Georgia, "Times New Roman", serif;
+        font-size: 36px;
+        color: rgba(233, 237, 239, 0.88);
+        line-height: 1.3;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="15"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div class="stage-fill" aria-hidden="true"></div>
+
+      <section
+        id="chat-scene"
+        class="clip chat-scene"
+        data-start="0"
+        data-duration="13.2"
+        data-track-index="1"
+      >
+        <div class="side-brand" aria-hidden="true">
+          <div class="wordmark">Geyser<span>Brain</span></div>
+          <p class="tagline">Control your geyser by WhatsApp.</p>
+        </div>
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="status-bar">
+            <span>05:42</span>
+            <span>●●● LTE</span>
+          </div>
+          <div class="wa-header">
+            <div class="avatar">G</div>
+            <div class="header-meta">
+              <div class="header-name">GeyserBrain</div>
+              <div class="header-status">online</div>
+            </div>
+          </div>
+          <div class="messages">
+            <div class="row in" id="msg1-wrap">
+              <div class="bubble in">
+                <span id="msg1-text" class="typed"></span><span id="msg1-cursor" class="cursor"></span>
+                <span class="bubble-time">05:41</span>
+              </div>
+            </div>
+            <div class="row out" id="msg2-wrap">
+              <div class="bubble out" id="msg2">
+                Done ✓ Geyser will run 05:15-06:00.
+                <span class="bubble-time">05:41</span>
+              </div>
+            </div>
+            <div class="row in" id="msg3-wrap">
+              <div class="bubble in" id="msg3">
+                How much did it cost this week?
+                <span class="bubble-time">05:42</span>
+              </div>
+            </div>
+            <div class="row out" id="msg4-wrap">
+              <div class="bubble out" id="msg4">
+                R64.20 - 18% less than last week 📉
+                <span class="bubble-time">05:42</span>
+              </div>
+            </div>
+          </div>
+          <div class="composer">
+            <div class="composer-pill">Message</div>
+            <div class="send-btn">↑</div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="end-scene"
+        class="clip end-scene"
+        data-start="13"
+        data-duration="2"
+        data-track-index="2"
+      >
+        <div class="brand-block">
+          <div id="wordmark" class="wordmark">Geyser<span>Brain</span></div>
+          <div id="underline" class="underline"></div>
+          <p id="tagline" class="tagline">Control your geyser by WhatsApp.</p>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      gsap.registerPlugin(TextPlugin);
+      window.__timelines = window.__timelines || {};
+
+      const MSG1 = "Heat water for 45 min before 6am tomorrow";
+      const tl = gsap.timeline({ paused: true });
+
+      gsap.set(["#msg1-wrap", "#msg2-wrap", "#msg3-wrap", "#msg4-wrap"], {
+        autoAlpha: 0,
+        y: 24,
+        scale: 0.92,
+        transformOrigin: "50% 100%",
+      });
+      gsap.set("#msg1-cursor", { opacity: 0 });
+      gsap.set(["#wordmark", "#underline", "#tagline"], { autoAlpha: 0, y: 20 });
+      gsap.set("#underline", { scaleX: 0 });
+
+      tl.to(
+        "#msg1-wrap",
+        { autoAlpha: 1, y: 0, scale: 1, duration: 0.35, ease: "power3.out" },
+        0.15,
+      );
+      tl.set("#msg1-cursor", { opacity: 1 }, 0.35);
+      tl.to(
+        "#msg1-text",
+        {
+          text: { value: MSG1 },
+          duration: MSG1.length / 12,
+          ease: "none",
+        },
+        0.4,
+      );
+      const typeEnd = 0.4 + MSG1.length / 12;
+      tl.to(
+        "#msg1-cursor",
+        {
+          opacity: 0,
+          duration: 0.35,
+          ease: "steps(1)",
+          repeat: 3,
+          yoyo: true,
+        },
+        typeEnd,
+      );
+      tl.set("#msg1-cursor", { opacity: 0 }, 2.85);
+
+      tl.fromTo(
+        "#msg2-wrap",
+        { autoAlpha: 0, y: 24, scale: 0.92 },
+        { autoAlpha: 1, y: 0, scale: 1, duration: 0.4, ease: "power3.out" },
+        3.05,
+      );
+      tl.fromTo(
+        "#msg3-wrap",
+        { autoAlpha: 0, y: 24, scale: 0.92 },
+        { autoAlpha: 1, y: 0, scale: 1, duration: 0.4, ease: "power3.out" },
+        6.05,
+      );
+      tl.fromTo(
+        "#msg4-wrap",
+        { autoAlpha: 0, y: 24, scale: 0.92 },
+        { autoAlpha: 1, y: 0, scale: 1, duration: 0.4, ease: "power3.out" },
+        9.05,
+      );
+
+      tl.to("#chat-scene .phone", { autoAlpha: 0, scale: 0.94, duration: 0.45, ease: "power2.in" }, 12.7);
+      tl.set("#chat-scene .phone", { autoAlpha: 0 }, 13.15);
+      tl.to("#chat-scene .side-brand", { autoAlpha: 0, duration: 0.3, ease: "power2.in" }, 12.7);
+      tl.set("#chat-scene .side-brand", { autoAlpha: 0 }, 13.0);
+
+      tl.fromTo(
+        "#wordmark",
+        { autoAlpha: 0, y: 24 },
+        { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" },
+        13.05,
+      );
+      tl.fromTo(
+        "#underline",
+        { autoAlpha: 1, scaleX: 0 },
+        { scaleX: 1, duration: 0.4, ease: "power2.out" },
+        13.35,
+      );
+      tl.fromTo(
+        "#tagline",
+        { autoAlpha: 0, y: 16 },
+        { autoAlpha: 1, y: 0, duration: 0.45, ease: "power3.out" },
+        13.55,
+      );
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
