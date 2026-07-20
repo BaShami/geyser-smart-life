@@ -621,9 +621,20 @@ function Landing() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [bloomed, setBloomed] = useState(false);
   const [chatActive, setChatActive] = useState(false);
+  const [chatMode, setChatMode] = useState<"qualify" | "waitlist">("qualify");
   const soundArmedRef = useRef(false);
+  const pricing = useCurrency();
 
   const openQualifyChat = () => {
+    setChatMode("qualify");
+    setChatActive(true);
+    setTimeout(() => {
+      document.getElementById("qualify-chat")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 60);
+  };
+
+  const openWaitlistChat = () => {
+    setChatMode("waitlist");
     setChatActive(true);
     setTimeout(() => {
       document.getElementById("qualify-chat")?.scrollIntoView({ behavior: "smooth", block: "center" });
