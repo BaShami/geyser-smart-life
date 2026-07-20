@@ -738,6 +738,42 @@ function Landing() {
         </Reveal>
       </section>
 
+      {/* 2b. Why WhatsApp? */}
+      <section className="py-24 md:py-32 px-6 border-t border-border/50">
+        <div className="max-w-5xl mx-auto">
+          <Reveal className="max-w-2xl mb-14 md:mb-20">
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">Why WhatsApp?</div>
+            <h2 className="text-4xl md:text-5xl leading-[1.05]">The habit's already there.</h2>
+          </Reveal>
+          <div className="space-y-14 md:space-y-20">
+            {[
+              {
+                headline: "You'll actually catch it before it costs you.",
+                body: "Alerts land in the chat you already check — not a dashboard you forget to open. A geyser left on gets caught in time, not discovered on next month's bill.",
+              },
+              {
+                headline: "Your savings show up on their own.",
+                body: "The weekly rand report arrives automatically — no login, no app to check for proof it's working.",
+              },
+              {
+                headline: "An app is one more icon competing for attention. This isn't.",
+                body: "Savings only happen if you keep using the thing — and WhatsApp doesn't ask you to build a new habit to get there.",
+              },
+            ].map((item, i) => (
+              <Reveal key={i} delay={i * 80}>
+                <div className="grid md:grid-cols-[auto_1fr] gap-4 md:gap-12 items-baseline">
+                  <div className="text-sm text-muted-foreground tracking-widest">0{i + 1}</div>
+                  <div className="space-y-3 max-w-2xl">
+                    <h3 className="text-2xl md:text-4xl leading-tight">{item.headline}</h3>
+                    <p className="text-lg text-muted-foreground leading-relaxed">{item.body}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 3. Is this for you? */}
       <section id="qualifies" className="scroll-mt-24 py-20 md:py-32 px-6 bg-secondary/40">
         <div className="max-w-3xl mx-auto">
@@ -746,18 +782,19 @@ function Landing() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl mb-10 md:mb-12">A short list. Nothing hidden.</h2>
           </Reveal>
           <ul className="space-y-5 md:space-y-6">
-            {["You have Wi-Fi at home."].map(
-              (line, i) => (
-                <Reveal key={i} delay={i * 60}>
-                  <li className="flex items-start gap-4 text-base sm:text-lg">
-                    <div className="mt-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <Check className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
-                    </div>
-                    <span className="leading-relaxed">{line}</span>
-                  </li>
-                </Reveal>
-              ),
-            )}
+            {[
+              "You have a geyser — the first device we bring online, with more on the way.",
+              "You have Wi-Fi at home.",
+            ].map((line, i) => (
+              <Reveal key={i} delay={i * 60}>
+                <li className="flex items-start gap-4 text-base sm:text-lg">
+                  <div className="mt-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <Check className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
+                  </div>
+                  <span className="leading-relaxed">{line}</span>
+                </li>
+              </Reveal>
+            ))}
           </ul>
           <Reveal delay={200}>
             <p className="text-sm text-muted-foreground italic mt-10 pl-10">
