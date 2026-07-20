@@ -707,8 +707,7 @@ function Landing() {
               <span className="italic text-white/80">Soft life.</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-white/85 max-w-lg leading-relaxed">
-              Talk to your home on WhatsApp. Manage your electricity through natural language, "if you can text you can
-              talk to your home" when you want — just talk.
+              Talk to your home on WhatsApp. We're on a mission to make any home smart — one conversation at a time.
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
               <button
