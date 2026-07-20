@@ -92,18 +92,28 @@ export function QualifyChat({ active }: { active: boolean }) {
     : "Hi, I qualified on your site and I'd like to get started.";
 
   return (
-    <div className="rounded-3xl border border-border/60 bg-background shadow-soft overflow-hidden">
-      <div className="px-5 py-4 border-b border-border/60 flex items-center gap-3">
-        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-        <div className="text-sm font-medium">GeyserBrain</div>
-        <div className="text-xs text-muted-foreground ml-auto">
-          {done ? "Done" : "usually replies in seconds"}
+    <div className="rounded-3xl border border-black/10 shadow-soft overflow-hidden">
+      <div className="px-5 py-4 flex items-center gap-3" style={{ backgroundColor: "#075E54", color: "#ffffff" }}>
+        <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold" style={{ backgroundColor: "#25D366", color: "#075E54" }}>
+          GB
+        </div>
+        <div>
+          <div className="text-sm font-medium leading-tight">GeyserBrain</div>
+          <div className="text-[11px] opacity-80 leading-tight">
+            {done ? "conversation ended" : "online · usually replies in seconds"}
+          </div>
         </div>
       </div>
 
       <div
         ref={scrollRef}
-        className="h-[380px] sm:h-[420px] overflow-y-auto px-4 sm:px-5 py-5 space-y-3 bg-secondary/30"
+        className="h-[380px] sm:h-[420px] overflow-y-auto px-4 sm:px-5 py-5 space-y-2"
+        style={{
+          backgroundColor: "#ECE5DD",
+          backgroundImage:
+            "radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px)",
+          backgroundSize: "18px 18px",
+        }}
       >
         {messages.map((m, i) => (
           <div
@@ -111,11 +121,14 @@ export function QualifyChat({ active }: { active: boolean }) {
             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
-                m.role === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-sm"
-                  : "bg-background text-foreground border border-border/60 rounded-bl-sm"
+              className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${
+                m.role === "user" ? "rounded-br-sm" : "rounded-bl-sm"
               }`}
+              style={
+                m.role === "user"
+                  ? { backgroundColor: "#DCF8C6", color: "#111b21" }
+                  : { backgroundColor: "#ffffff", color: "#111b21" }
+              }
             >
               {m.content}
             </div>
@@ -123,15 +136,15 @@ export function QualifyChat({ active }: { active: boolean }) {
         ))}
         {sending && (
           <div className="flex justify-start">
-            <div className="bg-background border border-border/60 rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-pulse" />
+            <div className="rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 shadow-sm" style={{ backgroundColor: "#ffffff" }}>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: "#25D366" }} />
               <span
-                className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-pulse"
-                style={{ animationDelay: "150ms" }}
+                className="w-1.5 h-1.5 rounded-full animate-pulse"
+                style={{ backgroundColor: "#25D366", animationDelay: "150ms" }}
               />
               <span
-                className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-pulse"
-                style={{ animationDelay: "300ms" }}
+                className="w-1.5 h-1.5 rounded-full animate-pulse"
+                style={{ backgroundColor: "#25D366", animationDelay: "300ms" }}
               />
             </div>
           </div>
@@ -142,12 +155,13 @@ export function QualifyChat({ active }: { active: boolean }) {
       </div>
 
       {showWa && (
-        <div className="px-4 sm:px-5 py-4 border-t border-border/60 bg-background">
+        <div className="px-4 sm:px-5 py-4 border-t border-black/10" style={{ backgroundColor: "#ffffff" }}>
           <a
             href={wa(waMessage)}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground px-6 py-3.5 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
+            className="w-full inline-flex items-center justify-center rounded-full px-6 py-3.5 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
+            style={{ backgroundColor: "#25D366", color: "#ffffff" }}
           >
             Continue on WhatsApp
           </a>
@@ -160,20 +174,23 @@ export function QualifyChat({ active }: { active: boolean }) {
             e.preventDefault();
             send();
           }}
-          className="flex items-center gap-2 border-t border-border/60 bg-background px-3 py-3"
+          className="flex items-center gap-2 border-t border-black/10 px-3 py-3"
+          style={{ backgroundColor: "#F0F2F5" }}
         >
           <input
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={sending}
-            placeholder="Type your reply…"
-            className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none placeholder:text-muted-foreground/70"
+            placeholder="Type a message"
+            className="flex-1 rounded-full px-4 py-2.5 text-sm focus:outline-none"
+            style={{ backgroundColor: "#ffffff", color: "#111b21" }}
           />
           <button
             type="submit"
             disabled={sending || !input.trim()}
-            className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40 transition-opacity"
+            className="w-10 h-10 rounded-full flex items-center justify-center disabled:opacity-40 transition-opacity"
+            style={{ backgroundColor: "#25D366", color: "#ffffff" }}
             aria-label="Send"
           >
             <Send className="w-4 h-4" />
