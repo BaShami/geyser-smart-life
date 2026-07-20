@@ -233,6 +233,9 @@ export const Route = createFileRoute("/api/qualify")({
                   name: merged.name,
                   contact: merged.contact,
                   city: merged.city,
+                  hasGeyser: merged.hasGeyser,
+                  hasWifi: merged.hasWifi,
+                  isRenter: merged.isRenter,
                   transcript,
                 });
               } else {
