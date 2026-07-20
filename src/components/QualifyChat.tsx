@@ -5,24 +5,27 @@ type Role = "user" | "assistant";
 type Msg = { role: Role; content: string };
 type Status = "asking" | "qualified" | "waitlist" | "done_qualified" | "done_waitlist";
 
+type Mode = "qualify" | "waitlist";
+
 type Extracted = {
   hasGeyser: boolean | null;
   hasWifi: boolean | null;
-  city: "pretoria" | "johannesburg" | "other" | null;
+  city: string | null;
   isRenter: boolean | null;
   name: string | null;
   contact: string | null;
   email: string | null;
 };
 
-const OPENER = "Hey — I'm here to check if we can help. What's going on with your place?";
+const OPENER_QUALIFY = "Hey — I'm here to check if we can help. What's going on with your place?";
+const OPENER_WAITLIST = "Sure — I can add you to the waitlist and let you know when we're live in your area. What's your name?";
 const WA_NUMBER = "27744224646";
 const wa = (text: string) =>
   `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
 
-export function QualifyChat({ active }: { active: boolean }) {
+export function QualifyChat({ active, mode = "qualify" }: { active: boolean; mode?: Mode }) {
   const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", content: OPENER },
+    { role: "assistant", content: mode === "waitlist" ? OPENER_WAITLIST : OPENER_QUALIFY },
   ]);
   const [extracted, setExtracted] = useState<Extracted>({
     hasGeyser: null,
@@ -67,7 +70,7 @@ export function QualifyChat({ active }: { active: boolean }) {
       const res = await fetch("/api/qualify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMsgs, extracted }),
+        body: JSON.stringify({ messages: nextMsgs, extracted, mode }),
       });
       const data = await res.json();
       if (!res.ok) {

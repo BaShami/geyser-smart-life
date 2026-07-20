@@ -12,10 +12,10 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
+import { useCurrency } from "@/hooks/use-currency";
+
 const WA_NUMBER = "27744224646";
 const wa = (text: string) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
-
-const CITIES = "Pretoria & Johannesburg";
 
 // Timothy: set to the exact second in reaction.mp4 where the visible reaction happens.
 // Until set, the bloom triggers when message 4 ("Done. It's heating now.") appears.
@@ -569,14 +569,21 @@ function SeeItWorkButton({ onArm, className = "" }: { onArm: () => void; classNa
 
 /* ---------- FAQ ---------- */
 
-const faqs = [
+type Faq = { q: string; a: string; action?: "waitlist" };
+
+const faqs: Faq[] = [
   {
     q: "Do I need to download an app?",
     a: "No. GeyserBrain works entirely through WhatsApp — the app you already have. Save the number and message it like you'd message anyone else.",
   },
   {
-    q: "Will it work with my existing geyser?",
-    a: "Most standard electric geysers are supported. We check your home before installation to confirm compatibility.",
+    q: "Which devices does it work with today?",
+    a: "We're a smart home company at heart. Today, that means your geyser — your home's biggest electricity cost. More devices are on our roadmap.",
+  },
+  {
+    q: "Is this available where I am?",
+    a: "We're expanding steadily. Message us and we'll confirm availability for your area — if we're not there yet, we'll add you to the waitlist.",
+    action: "waitlist",
   },
   {
     q: "How long does installation take?",
@@ -614,9 +621,20 @@ function Landing() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [bloomed, setBloomed] = useState(false);
   const [chatActive, setChatActive] = useState(false);
+  const [chatMode, setChatMode] = useState<"qualify" | "waitlist">("qualify");
   const soundArmedRef = useRef(false);
+  const pricing = useCurrency();
 
   const openQualifyChat = () => {
+    setChatMode("qualify");
+    setChatActive(true);
+    setTimeout(() => {
+      document.getElementById("qualify-chat")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 60);
+  };
+
+  const openWaitlistChat = () => {
+    setChatMode("waitlist");
     setChatActive(true);
     setTimeout(() => {
       document.getElementById("qualify-chat")?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -689,8 +707,7 @@ function Landing() {
               <span className="italic text-white/80">Soft life.</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-white/85 max-w-lg leading-relaxed">
-              Talk to your home on WhatsApp. Manage your electricity through natural language, "if you can text you can
-              talk to your home" when you want — just talk.
+              Talk to your home on WhatsApp. We're on a mission to make any home smart — one conversation at a time.
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
               <button
@@ -721,6 +738,42 @@ function Landing() {
         </Reveal>
       </section>
 
+      {/* 2b. Why WhatsApp? */}
+      <section className="py-24 md:py-32 px-6 border-t border-border/50">
+        <div className="max-w-5xl mx-auto">
+          <Reveal className="max-w-2xl mb-14 md:mb-20">
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">Why WhatsApp?</div>
+            <h2 className="text-4xl md:text-5xl leading-[1.05]">The habit's already there.</h2>
+          </Reveal>
+          <div className="space-y-14 md:space-y-20">
+            {[
+              {
+                headline: "You'll actually catch it before it costs you.",
+                body: "Alerts land in the chat you already check — not a dashboard you forget to open. A geyser left on gets caught in time, not discovered on next month's bill.",
+              },
+              {
+                headline: "Your savings show up on their own.",
+                body: "The weekly rand report arrives automatically — no login, no app to check for proof it's working.",
+              },
+              {
+                headline: "An app is one more icon competing for attention. This isn't.",
+                body: "Savings only happen if you keep using the thing — and WhatsApp doesn't ask you to build a new habit to get there.",
+              },
+            ].map((item, i) => (
+              <Reveal key={i} delay={i * 80}>
+                <div className="grid md:grid-cols-[auto_1fr] gap-4 md:gap-12 items-baseline">
+                  <div className="text-sm text-muted-foreground tracking-widest">0{i + 1}</div>
+                  <div className="space-y-3 max-w-2xl">
+                    <h3 className="text-2xl md:text-4xl leading-tight">{item.headline}</h3>
+                    <p className="text-lg text-muted-foreground leading-relaxed">{item.body}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 3. Is this for you? */}
       <section id="qualifies" className="scroll-mt-24 py-20 md:py-32 px-6 bg-secondary/40">
         <div className="max-w-3xl mx-auto">
@@ -729,18 +782,19 @@ function Landing() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl mb-10 md:mb-12">A short list. Nothing hidden.</h2>
           </Reveal>
           <ul className="space-y-5 md:space-y-6">
-            {["You have Wi-Fi at home."].map(
-              (line, i) => (
-                <Reveal key={i} delay={i * 60}>
-                  <li className="flex items-start gap-4 text-base sm:text-lg">
-                    <div className="mt-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <Check className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
-                    </div>
-                    <span className="leading-relaxed">{line}</span>
-                  </li>
-                </Reveal>
-              ),
-            )}
+            {[
+              "You have a geyser — the first device we bring online, with more on the way.",
+              "You have Wi-Fi at home.",
+            ].map((line, i) => (
+              <Reveal key={i} delay={i * 60}>
+                <li className="flex items-start gap-4 text-base sm:text-lg">
+                  <div className="mt-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <Check className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
+                  </div>
+                  <span className="leading-relaxed">{line}</span>
+                </li>
+              </Reveal>
+            ))}
           </ul>
           <Reveal delay={200}>
             <p className="text-sm text-muted-foreground italic mt-10 pl-10">
@@ -763,7 +817,7 @@ function Landing() {
 
           {chatActive && (
             <div id="qualify-chat" className="mt-12 max-w-xl mx-auto scroll-mt-24">
-              <QualifyChat active={chatActive} />
+              <QualifyChat active={chatActive} mode={chatMode} />
             </div>
           )}
         </div>
@@ -854,7 +908,7 @@ function Landing() {
           </div>
           <Reveal delay={300}>
             <p className="text-center text-sm text-muted-foreground mt-16">
-              Currently rolling out in {CITIES}. More areas coming as we grow.
+              Not sure if we cover your area? <button type="button" onClick={openWaitlistChat} className="underline hover:text-foreground transition">Join the waitlist</button>.
             </p>
           </Reveal>
         </div>
@@ -905,8 +959,10 @@ function Landing() {
           </Reveal>
           <Reveal delay={80}>
             <div>
-              <div className="text-6xl md:text-8xl tracking-tight leading-none">R1,999</div>
-              <div className="text-primary-foreground/70 mt-3">installed (incl. VAT)</div>
+              <div className="text-6xl md:text-8xl tracking-tight leading-none">{pricing.install}</div>
+              <div className="text-primary-foreground/70 mt-3">
+                installed{pricing.currency === "ZAR" ? " (incl. VAT)" : ""}
+              </div>
             </div>
           </Reveal>
           <Reveal delay={140}>
@@ -924,7 +980,10 @@ function Landing() {
                   </li>
                 ))}
               </ul>
-              <p className="text-xs text-primary-foreground/60 mt-6">Thereafter R99/month. Cancel anytime.</p>
+              <p className="text-xs text-primary-foreground/60 mt-6">
+                Thereafter {pricing.monthly}/month. Cancel anytime.
+                {pricing.approx ? " Prices outside South Africa are estimates." : ""}
+              </p>
             </div>
           </Reveal>
           <Reveal delay={200}>
@@ -970,7 +1029,18 @@ function Landing() {
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <p className="px-8 pb-6 text-muted-foreground leading-relaxed">{f.a}</p>
+                      <div className="px-8 pb-6 text-muted-foreground leading-relaxed space-y-3">
+                        <p>{f.a}</p>
+                        {f.action === "waitlist" && (
+                          <button
+                            type="button"
+                            onClick={openWaitlistChat}
+                            className="text-sm text-foreground underline hover:opacity-70 transition"
+                          >
+                            Join the waitlist →
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
