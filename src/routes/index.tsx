@@ -727,50 +727,16 @@ function Landing() {
         </div>
       </section>
 
-      {/* 2. Philosophy */}
-      <section className="py-32 md:py-40 px-6">
-        <Reveal className="max-w-3xl mx-auto text-center space-y-8">
-          <div className="text-xs text-muted-foreground uppercase tracking-[0.25em]">The quiet smart home</div>
-          <h2 className="text-4xl md:text-6xl leading-[1.05]">Your home shouldn't feel mechanical.</h2>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            No control panels to study. No complicated apps to manage. Just tell your home what you need.
-          </p>
-        </Reveal>
-      </section>
-
-      {/* 2b. Why WhatsApp? */}
-      <section className="py-24 md:py-32 px-6 border-t border-border/50">
-        <div className="max-w-5xl mx-auto">
-          <Reveal className="max-w-2xl mb-14 md:mb-20">
-            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">Why WhatsApp?</div>
-            <h2 className="text-4xl md:text-5xl leading-[1.05]">The habit's already there.</h2>
+      {/* 4. Demo */}
+      <section id="demo" className="py-28 md:py-36 px-6">
+        <div className="max-w-6xl mx-auto space-y-14">
+          <Reveal className="max-w-2xl">
+            <h2 className="text-4xl md:text-5xl leading-tight">A conversation, not a control panel.</h2>
+            <p className="text-lg text-muted-foreground max-w-md mt-4">
+              Control your geyser the same way you'd ask someone at home.
+            </p>
           </Reveal>
-          <div className="space-y-14 md:space-y-20">
-            {[
-              {
-                headline: "You'll actually catch it before it costs you.",
-                body: "Alerts land in the chat you already check — not a dashboard you forget to open. A geyser left on gets caught in time, not discovered on next month's bill.",
-              },
-              {
-                headline: "Your savings show up on their own.",
-                body: "The weekly rand report arrives automatically — no login, no app to check for proof it's working.",
-              },
-              {
-                headline: "An app is one more icon competing for attention. This isn't.",
-                body: "Savings only happen if you keep using the thing — and WhatsApp doesn't ask you to build a new habit to get there.",
-              },
-            ].map((item, i) => (
-              <Reveal key={i} delay={i * 80}>
-                <div className="grid md:grid-cols-[auto_1fr] gap-4 md:gap-12 items-baseline">
-                  <div className="text-sm text-muted-foreground tracking-widest">0{i + 1}</div>
-                  <div className="space-y-3 max-w-2xl">
-                    <h3 className="text-2xl md:text-4xl leading-tight">{item.headline}</h3>
-                    <p className="text-lg text-muted-foreground leading-relaxed">{item.body}</p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
+          <DemoBlock onBloom={() => setBloomed(true)} soundArmedRef={soundArmedRef} />
         </div>
       </section>
 
@@ -823,21 +789,18 @@ function Landing() {
         </div>
       </section>
 
-      {/* 4. Demo */}
-      <section id="demo" className="py-28 md:py-36 px-6">
-        <div className="max-w-6xl mx-auto space-y-14">
-          <Reveal className="max-w-2xl">
-            <h2 className="text-4xl md:text-5xl leading-tight">A conversation, not a control panel.</h2>
-            <p className="text-lg text-muted-foreground max-w-md mt-4">
-              Control your geyser the same way you'd ask someone at home.
-            </p>
-          </Reveal>
-          <DemoBlock onBloom={() => setBloomed(true)} soundArmedRef={soundArmedRef} />
-        </div>
+      {/* 2. Philosophy */}
+      <section className="py-32 md:py-40 px-6">
+        <Reveal className="max-w-3xl mx-auto text-center space-y-8">
+          <div className="text-xs text-muted-foreground uppercase tracking-[0.25em]">The quiet smart home</div>
+          <h2 className="text-4xl md:text-6xl leading-[1.05]">Your home shouldn't feel mechanical.</h2>
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+            No control panels to study. No complicated apps to manage. Just tell your home what you need.
+          </p>
+        </Reveal>
       </section>
 
-      {/* 5. Benefits */}
-      <section id="benefits" className="py-28 md:py-36 px-6 bg-secondary/40">
+
         <div className="max-w-5xl mx-auto space-y-24 md:space-y-32">
           {[
             {
