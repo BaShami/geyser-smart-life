@@ -12,10 +12,10 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
+import { useCurrency } from "@/hooks/use-currency";
+
 const WA_NUMBER = "27744224646";
 const wa = (text: string) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
-
-const CITIES = "Pretoria & Johannesburg";
 
 // Timothy: set to the exact second in reaction.mp4 where the visible reaction happens.
 // Until set, the bloom triggers when message 4 ("Done. It's heating now.") appears.
