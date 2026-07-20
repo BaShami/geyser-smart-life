@@ -959,8 +959,10 @@ function Landing() {
           </Reveal>
           <Reveal delay={80}>
             <div>
-              <div className="text-6xl md:text-8xl tracking-tight leading-none">R1,999</div>
-              <div className="text-primary-foreground/70 mt-3">installed (incl. VAT)</div>
+              <div className="text-6xl md:text-8xl tracking-tight leading-none">{pricing.install}</div>
+              <div className="text-primary-foreground/70 mt-3">
+                installed{pricing.currency === "ZAR" ? " (incl. VAT)" : ""}
+              </div>
             </div>
           </Reveal>
           <Reveal delay={140}>
@@ -978,7 +980,10 @@ function Landing() {
                   </li>
                 ))}
               </ul>
-              <p className="text-xs text-primary-foreground/60 mt-6">Thereafter R99/month. Cancel anytime.</p>
+              <p className="text-xs text-primary-foreground/60 mt-6">
+                Thereafter {pricing.monthly}/month. Cancel anytime.
+                {pricing.approx ? " Prices outside South Africa are estimates." : ""}
+              </p>
             </div>
           </Reveal>
           <Reveal delay={200}>
