@@ -70,7 +70,7 @@ export function QualifyChat({ active, mode = "qualify" }: { active: boolean; mod
       const res = await fetch("/api/qualify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMsgs, extracted }),
+        body: JSON.stringify({ messages: nextMsgs, extracted, mode }),
       });
       const data = await res.json();
       if (!res.ok) {

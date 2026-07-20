@@ -4,11 +4,12 @@ import { sendTemplateEmail } from "@/lib/email-templates/send-email";
 
 type Role = "user" | "assistant";
 type Msg = { role: Role; content: string };
+type Mode = "qualify" | "waitlist";
 
 type Extracted = {
   hasGeyser: boolean | null;
   hasWifi: boolean | null;
-  city: "pretoria" | "johannesburg" | "other" | null;
+  city: string | null;
   isRenter: boolean | null;
   name: string | null;
   contact: string | null;
@@ -28,44 +29,44 @@ const EMPTY: Extracted = {
 };
 
 const NOTIFY_EMAIL = "timothy.s@bookestyle.com";
-const HARD_CAP = 6; // max user turns before we force a decision
+const HARD_CAP = 6;
 
-function systemPrompt(extracted: Extracted, userTurns: number) {
+function qualifySystemPrompt(extracted: Extracted, userTurns: number) {
   const missing: string[] = [];
   if (extracted.hasGeyser === null) missing.push("whether they have a geyser");
   if (extracted.hasWifi === null) missing.push("whether they have Wi-Fi at home");
-  if (extracted.city === null) missing.push("where they live (Pretoria, Johannesburg, or elsewhere)");
 
   const known = Object.entries(extracted)
     .filter(([, v]) => v !== null)
     .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
     .join(", ") || "nothing yet";
 
-  return `You are the GeyserBrain qualifying assistant. GeyserBrain is a smart-home service in South Africa that lets people control their geyser via WhatsApp. It currently only serves Pretoria and Johannesburg.
+  return `You are the GeyserBrain qualifying assistant. GeyserBrain is a smart-home service that lets people control their geyser via WhatsApp — the first device we bring online, with more on the roadmap.
 
-Your job is to have a natural, warm conversation to find out three things:
+Your job is to have a natural, warm conversation to find out two things:
 1. Do they have a geyser?
 2. Do they have Wi-Fi at home?
-3. Do they live in Pretoria or Johannesburg?
+
+Do NOT ask about location, city, or country. Do not mention any city, region, or country. Availability by area is handled separately.
 
 RULES:
 - Keep replies SHORT (1–2 sentences). Cost matters.
 - Ask about only ONE missing thing at a time, phrased naturally — never a checklist.
 - If they already stated something, do NOT ask again.
-- If they ask an off-topic question (pricing, install time, solar, refunds, renter, etc.), answer briefly then gently return to the missing qualifier.
+- If they ask an off-topic question (pricing, install time, solar, refunds, renter, roadmap, etc.), answer briefly then gently return to the missing qualifier.
 - Tone: calm, brief, human. No emojis. No exclamation marks unless celebrating a fit.
 - If they are a renter, mention: "Since you rent, you'll want your landlord or body corporate's OK before installation." Then continue.
+- If the visitor asks whether we're available where they live, do NOT confirm or deny — set status="waitlist" and offer to add them to the waitlist (ask for name + email).
 
 FAQ you can draw from (be brief):
-- Pricing: R199/month for founding 10 members, includes device + install. Normally R249/month.
+- Devices today: geyser only — your home's biggest electricity cost. More devices are on our roadmap.
+- Pricing: shown on the site; monthly is very low.
 - Install: ~1 hour by a certified electrician.
 - Solar/inverter homes: works fine, we integrate around your existing setup.
-- Refund: full refund if you don't qualify or aren't satisfied in the first 30 days.
-- Coverage: only Pretoria & Johannesburg right now, expanding later.
+- Refund: full refund if you don't qualify or aren't satisfied.
 
 DECISION LOGIC:
-- If all three (geyser + wifi + city in Pretoria/Johannesburg) are confirmed → status="qualified" and reply warmly, mention we're a great fit and that they can continue on WhatsApp. If you don't have their name yet, ask for it in the reply.
-- If city is "other" (not Pretoria or Johannesburg) → status="waitlist". Reply: gently explain we're only in Pretoria & Johannesburg for now, and offer to add them to the waitlist. Ask for their name and email.
+- If BOTH (geyser + wifi) are confirmed → status="qualified" and reply warmly. If you don't have their name yet, ask for it.
 - If you already have name+contact after qualifying → status="done_qualified".
 - If you already have name+email for waitlist → status="done_waitlist".
 - Otherwise → status="asking".
@@ -77,8 +78,45 @@ CURRENT STATE:
 ${userTurns >= HARD_CAP - 1 ? "- HARD CAP REACHED: decide now. If unresolved, treat as waitlist and ask for name+email." : ""}
 
 OUTPUT: return ONLY a compact JSON object, no prose, no code fences:
-{"reply": string, "extracted": {"hasGeyser": bool|null, "hasWifi": bool|null, "city": "pretoria"|"johannesburg"|"other"|null, "isRenter": bool|null, "name": string|null, "contact": string|null, "email": string|null}, "status": "asking"|"qualified"|"waitlist"|"done_qualified"|"done_waitlist"}
-Merge new info with what's already known; never overwrite known values with null.`;
+{"reply": string, "extracted": {"hasGeyser": bool|null, "hasWifi": bool|null, "city": null, "isRenter": bool|null, "name": string|null, "contact": string|null, "email": string|null}, "status": "asking"|"qualified"|"waitlist"|"done_qualified"|"done_waitlist"}
+Merge new info with what's already known; never overwrite known values with null. Always leave city as null.`;
+}
+
+function waitlistSystemPrompt(extracted: Extracted, userTurns: number) {
+  const known = Object.entries(extracted)
+    .filter(([, v]) => v !== null)
+    .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
+    .join(", ") || "nothing yet";
+  const missing: string[] = [];
+  if (!extracted.name) missing.push("their name");
+  if (!extracted.email) missing.push("their email address");
+
+  return `You are the GeyserBrain waitlist assistant. The visitor wants to be notified when we launch in their area.
+
+Your only job is to collect their NAME and EMAIL, warmly and briefly. Do not ask about geyser, Wi-Fi, city, or country.
+
+RULES:
+- Very short replies (1 sentence).
+- Ask for one missing thing at a time.
+- Never mention any city, region, or country.
+- If they ask something off-topic, answer briefly from FAQ, then return to the missing detail.
+
+FAQ (brief):
+- We're expanding steadily; joining the waitlist means we'll message you the moment we're live in your area.
+- Devices today: geyser. More on the roadmap.
+
+DECISION LOGIC:
+- Once you have BOTH name and email → status="done_waitlist" and reply warmly confirming they're on the list.
+- Otherwise → status="waitlist".
+
+CURRENT STATE:
+- Already known: ${known}
+- Still missing: ${missing.length ? missing.join(", ") : "nothing — confirm and set status=done_waitlist"}
+- User turns so far: ${userTurns} of ${HARD_CAP} max.
+
+OUTPUT: return ONLY a compact JSON object, no prose, no code fences:
+{"reply": string, "extracted": {"hasGeyser": null, "hasWifi": null, "city": null, "isRenter": null, "name": string|null, "contact": string|null, "email": string|null}, "status": "waitlist"|"done_waitlist"}
+Never overwrite known values with null.`;
 }
 
 function safeParse(text: string): {
@@ -138,6 +176,7 @@ export const Route = createFileRoute("/api/qualify")({
         let body: {
           messages?: Msg[];
           extracted?: Extracted;
+          mode?: Mode;
         };
         try {
           body = await request.json();
@@ -147,12 +186,17 @@ export const Route = createFileRoute("/api/qualify")({
 
         const messages = Array.isArray(body.messages) ? body.messages.slice(-20) : [];
         const prevExtracted = { ...EMPTY, ...(body.extracted ?? {}) };
+        const mode: Mode = body.mode === "waitlist" ? "waitlist" : "qualify";
         const userTurns = messages.filter((m) => m.role === "user").length;
 
         const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) {
           return Response.json({ error: "missing_key" }, { status: 500 });
         }
+
+        const system = mode === "waitlist"
+          ? waitlistSystemPrompt(prevExtracted, userTurns)
+          : qualifySystemPrompt(prevExtracted, userTurns);
 
         const llmRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -166,7 +210,7 @@ export const Route = createFileRoute("/api/qualify")({
             max_tokens: 300,
             response_format: { type: "json_object" },
             messages: [
-              { role: "system", content: systemPrompt(prevExtracted, userTurns) },
+              { role: "system", content: system },
               ...messages,
             ],
           }),
@@ -203,10 +247,14 @@ export const Route = createFileRoute("/api/qualify")({
         let status = parsed.status;
 
         // Hard cap safety net
-        if (userTurns >= HARD_CAP && status === "asking") {
-          status = merged.city && merged.city !== "other" && merged.hasGeyser && merged.hasWifi
-            ? "qualified"
-            : "waitlist";
+        if (userTurns >= HARD_CAP && (status === "asking" || status === "waitlist")) {
+          if (mode === "qualify" && merged.hasGeyser && merged.hasWifi) {
+            status = "qualified";
+          } else if (merged.name && merged.email) {
+            status = "done_waitlist";
+          } else {
+            status = "waitlist";
+          }
         }
 
         // Persist terminal states
@@ -223,7 +271,7 @@ export const Route = createFileRoute("/api/qualify")({
                 await admin.from("qualify_leads").insert({
                   name: merged.name,
                   contact: merged.contact,
-                  city: merged.city,
+                  city: null,
                   has_geyser: merged.hasGeyser,
                   has_wifi: merged.hasWifi,
                   is_renter: merged.isRenter,
@@ -232,7 +280,7 @@ export const Route = createFileRoute("/api/qualify")({
                 await sendNotifyEmail({
                   name: merged.name,
                   contact: merged.contact,
-                  city: merged.city,
+                  city: null,
                   hasGeyser: merged.hasGeyser,
                   hasWifi: merged.hasWifi,
                   isRenter: merged.isRenter,
@@ -242,14 +290,10 @@ export const Route = createFileRoute("/api/qualify")({
                 await admin.from("qualify_waitlist").insert({
                   name: merged.name,
                   email: merged.email,
-                  city: merged.city,
-                  reason:
-                    merged.city && merged.city !== "pretoria" && merged.city !== "johannesburg"
-                      ? "out_of_area"
-                      : "unresolved",
+                  city: null,
+                  reason: mode === "waitlist" ? "availability_request" : "unresolved",
                   transcript,
                 });
-                // Waitlist entries are batched — no per-entry email.
               }
             } catch (err) {
               console.error("[qualify] persist error", err);
