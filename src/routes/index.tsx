@@ -729,7 +729,7 @@ function Landing() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl mb-10 md:mb-12">A short list. Nothing hidden.</h2>
           </Reveal>
           <ul className="space-y-5 md:space-y-6">
-            {["You have a geyser.", "You have Wi-Fi at home.", "You live in Pretoria or Johannesburg."].map(
+            {["You have Wi-Fi at home."].map(
               (line, i) => (
                 <Reveal key={i} delay={i * 60}>
                   <li className="flex items-start gap-4 text-base sm:text-lg">
