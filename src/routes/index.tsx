@@ -817,7 +817,7 @@ function Landing() {
 
           {chatActive && (
             <div id="qualify-chat" className="mt-12 max-w-xl mx-auto scroll-mt-24">
-              <QualifyChat active={chatActive} />
+              <QualifyChat active={chatActive} mode={chatMode} />
             </div>
           )}
         </div>
