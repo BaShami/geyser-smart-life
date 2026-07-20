@@ -14,7 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      qualify_leads: {
+        Row: {
+          city: string | null
+          contact: string | null
+          created_at: string
+          has_geyser: boolean | null
+          has_wifi: boolean | null
+          id: string
+          is_renter: boolean | null
+          name: string | null
+          notes: string | null
+          transcript: Json
+        }
+        Insert: {
+          city?: string | null
+          contact?: string | null
+          created_at?: string
+          has_geyser?: boolean | null
+          has_wifi?: boolean | null
+          id?: string
+          is_renter?: boolean | null
+          name?: string | null
+          notes?: string | null
+          transcript?: Json
+        }
+        Update: {
+          city?: string | null
+          contact?: string | null
+          created_at?: string
+          has_geyser?: boolean | null
+          has_wifi?: boolean | null
+          id?: string
+          is_renter?: boolean | null
+          name?: string | null
+          notes?: string | null
+          transcript?: Json
+        }
+        Relationships: []
+      }
+      qualify_waitlist: {
+        Row: {
+          city: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          reason: string | null
+          transcript: Json
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          reason?: string | null
+          transcript?: Json
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          reason?: string | null
+          transcript?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
