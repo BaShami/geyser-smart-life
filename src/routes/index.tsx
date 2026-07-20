@@ -800,8 +800,10 @@ function Landing() {
         </Reveal>
       </section>
 
-
+      {/* 5. Benefits */}
+      <section id="benefits" className="py-28 md:py-36 px-6 bg-secondary/40">
         <div className="max-w-5xl mx-auto space-y-24 md:space-y-32">
+
           {[
             {
               n: "01",
