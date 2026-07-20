@@ -908,7 +908,7 @@ function Landing() {
           </div>
           <Reveal delay={300}>
             <p className="text-center text-sm text-muted-foreground mt-16">
-              Currently rolling out in {CITIES}. More areas coming as we grow.
+              Not sure if we cover your area? <button type="button" onClick={openWaitlistChat} className="underline hover:text-foreground transition">Join the waitlist</button>.
             </p>
           </Reveal>
         </div>
