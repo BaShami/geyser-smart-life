@@ -30,3 +30,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# HyperFrames
+videos/**/snapshots/
+videos/**/renders/
+videos/**/node_modules/
+videos/**/.hyperframes/

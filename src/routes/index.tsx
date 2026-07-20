@@ -4,7 +4,6 @@ import { Check, ChevronDown, MessageCircle, Volume2, VolumeX, Play, Pause, Rotat
 import heroImg from "@/assets/hero.jpg";
 import electricianImg from "@/assets/electrician.jpg";
 import homeImg from "@/assets/home.jpg";
-import reactionVideo from "@/assets/reaction.mp4.asset.json";
 import logoAsset from "@/assets/geyserbrain-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
@@ -16,8 +15,8 @@ const wa = (text: string) => `https://wa.me/${WA_NUMBER}?text=${encodeURICompone
 
 const CITIES = "Pretoria & Johannesburg";
 
-// Timothy: set to the exact second in reaction.mp4 where the visible reaction happens.
-// Until set, the bloom triggers when message 4 ("Done. It's heating now.") appears.
+// Soft smart-home lights demo (HyperFrames) — bloom when the "Done" reply lands.
+const REACTION_VIDEO_SRC = "/videos/reaction.mp4";
 const REACTION_TIMESTAMP: number | null = null;
 
 /* ---------- primitives ---------- */
@@ -358,7 +357,7 @@ function DemoBlock({
           <div className="relative rounded-[2.5rem] overflow-hidden shadow-float bg-black aspect-[4/5]">
             <video
               ref={videoRef}
-              src={reactionVideo.url}
+              src={REACTION_VIDEO_SRC}
               preload="metadata"
               playsInline
               muted
