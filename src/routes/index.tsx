@@ -1029,7 +1029,18 @@ function Landing() {
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <p className="px-8 pb-6 text-muted-foreground leading-relaxed">{f.a}</p>
+                      <div className="px-8 pb-6 text-muted-foreground leading-relaxed space-y-3">
+                        <p>{f.a}</p>
+                        {f.action === "waitlist" && (
+                          <button
+                            type="button"
+                            onClick={openWaitlistChat}
+                            className="text-sm text-foreground underline hover:opacity-70 transition"
+                          >
+                            Join the waitlist →
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
