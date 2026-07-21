@@ -692,8 +692,13 @@ function Landing() {
         <img
           src={heroImg}
           alt="A calm, softly lit home interior"
+          width={1920}
+          height={1080}
+          fetchPriority="high"
+          decoding="async"
           className="absolute inset-0 w-full h-full object-cover duotone"
         />
+
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent md:from-black/60 md:via-black/25" />
         <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-10 flex items-end md:items-center">
           <div className="pb-20 md:pb-0 max-w-2xl text-white space-y-5 md:space-y-6">
