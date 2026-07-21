@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, MessageCircle, Volume2, VolumeX, Play, Pause, RotateCcw } from "lucide-react";
+import { Check, ChevronDown, MessageCircle, Volume2, VolumeX, Play, Pause, RotateCcw, Menu, X } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 
 import homeImg from "@/assets/home.jpg";
@@ -622,6 +622,7 @@ function Landing() {
   const [bloomed, setBloomed] = useState(false);
   const [chatActive, setChatActive] = useState(false);
   const [chatMode, setChatMode] = useState<"qualify" | "waitlist">("qualify");
+  const [menuOpen, setMenuOpen] = useState(false);
   const soundArmedRef = useRef(false);
   const pricing = useCurrency();
 
@@ -680,15 +681,45 @@ function Landing() {
               FAQ
             </a>
           </nav>
-          <a
-            href={wa("GEYSER")}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-4 md:px-5 py-2 text-xs font-medium hover:opacity-90 transition shrink-0"
-          >
-            Message us
-          </a>
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href={wa("GEYSER")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-4 md:px-5 py-2 text-xs font-medium hover:opacity-90 transition"
+            >
+              Message us
+            </a>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-full border border-border/60 bg-white/60 hover:bg-white transition"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+            >
+              {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
+        {menuOpen && (
+          <div className="md:hidden mt-2 rounded-2xl bg-white/90 backdrop-blur-xl border border-border/60 shadow-soft p-2">
+            {[
+              { href: "#benefits", label: "Benefits" },
+              { href: "#how", label: "How it works" },
+              { href: "#pricing", label: "Pricing" },
+              { href: "#faq", label: "FAQ" },
+            ].map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                onClick={() => setMenuOpen(false)}
+                className="block px-4 py-3 rounded-xl text-sm text-foreground hover:bg-muted transition"
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+        )}
       </header>
 
       {/* 1. Hero */}
