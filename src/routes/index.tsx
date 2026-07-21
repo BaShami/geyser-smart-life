@@ -622,6 +622,7 @@ function Landing() {
   const [bloomed, setBloomed] = useState(false);
   const [chatActive, setChatActive] = useState(false);
   const [chatMode, setChatMode] = useState<"qualify" | "waitlist">("qualify");
+  const [menuOpen, setMenuOpen] = useState(false);
   const soundArmedRef = useRef(false);
   const pricing = useCurrency();
 
