@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, MessageCircle, Volume2, VolumeX, Play, Pause, RotateCcw } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
-import electricianImg from "@/assets/electrician.jpg";
+
 import homeImg from "@/assets/home.jpg";
 import reactionVideo from "@/assets/reaction.mp4.asset.json";
-import logoAsset from "@/assets/geyserbrain-logo.png.asset.json";
+import logoAsset from "@/assets/geyserbrain-logo.png";
 import { QualifyChat } from "@/components/QualifyChat";
 
 export const Route = createFileRoute("/")({
@@ -573,45 +573,24 @@ type Faq = { q: string; a: string; action?: "waitlist" };
 
 const faqs: Faq[] = [
   {
-    q: "Do I need to download an app?",
-    a: "No. GeyserBrain works entirely through WhatsApp — the app you already have. Save the number and message it like you'd message anyone else.",
-  },
-  {
-    q: "Which devices does it work with today?",
-    a: "We're a smart home company at heart. Today, that means your geyser — your home's biggest electricity cost. More devices are on our roadmap.",
-  },
-  {
-    q: "Is this available where I am?",
-    a: "We're expanding steadily. Message us and we'll confirm availability for your area — if we're not there yet, we'll add you to the waitlist.",
-    action: "waitlist",
-  },
-  {
     q: "How long does installation take?",
-    a: "A certified electrician typically completes installation in under two hours, with minimal disruption to your home.",
-  },
-  {
-    q: "Is my data private?",
-    a: "Yes. Only you and the people you invite can control your geyser. We never share your usage data.",
-  },
-  {
-    q: "Can I cancel anytime?",
-    a: "Yes. The monthly service is month-to-month with no lock-in after the first three months included in your install.",
-  },
-  {
-    q: "What if I rent my home?",
-    a: "You'll need permission from your landlord or body corporate, since installation involves your home's distribution board.",
-  },
-  {
-    q: "Do I need to already own a smart switch?",
-    a: "No — the smart controller is included in your once-off price and fitted by our electrician.",
-  },
-  {
-    q: "What happens during load-shedding?",
-    a: "GeyserBrain doesn't yet sync with load-shedding schedules — that's on our roadmap. Manual control and your schedules resume automatically once power returns.",
+    a: "Usually under two hours. A certified electrician handles it — you barely notice it happen.",
   },
   {
     q: "What if my home doesn't qualify?",
-    a: "You get a full refund. If we can't install for any technical reason, we return your payment in full — no questions asked.",
+    a: "You get a full refund. No questions, no forms.",
+  },
+  {
+    q: "Can I cancel anytime?",
+    a: "Yes. Month-to-month, no lock-in.",
+  },
+  {
+    q: "Is my data private?",
+    a: "Yes. Only you and the people you invite can control your geyser. We never share your usage.",
+  },
+  {
+    q: "What if I rent my home?",
+    a: "You'll need your landlord's OK — the install touches your distribution board.",
   },
 ];
 
@@ -663,15 +642,15 @@ function Landing() {
       <header className="fixed top-3 md:top-4 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-5xl">
         <div className="rounded-full bg-white/70 backdrop-blur-xl border border-border/60 shadow-soft pl-3 pr-3 md:pl-5 md:pr-5 py-2 md:py-3 flex items-center justify-between gap-3">
           <a href="#" className="flex items-center gap-2 font-medium min-w-0">
-            <img src={logoAsset.url} alt="GeyserBrain" className="h-7 md:h-8 w-auto shrink-0" />
+            <img src={logoAsset} alt="GeyserBrain" className="h-7 md:h-8 w-auto shrink-0" />
             <span className="hidden sm:inline truncate">GeyserBrain</span>
           </a>
           <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-            <a href="#how" className="hover:text-foreground transition">
-              How it works
-            </a>
             <a href="#benefits" className="hover:text-foreground transition">
               Benefits
+            </a>
+            <a href="#how" className="hover:text-foreground transition">
+              How it works
             </a>
             <a href="#pricing" className="hover:text-foreground transition">
               Pricing
@@ -707,7 +686,7 @@ function Landing() {
               <span className="italic text-white/80">Soft life.</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-white/85 max-w-lg leading-relaxed">
-              Talk to your home on WhatsApp. We're on a mission to make any home smart — one conversation at a time.
+              Talk to your home on WhatsApp. Calm, effortless, always in your pocket.
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
               <button
@@ -727,197 +706,92 @@ function Landing() {
         </div>
       </section>
 
-      {/* 4. Demo */}
-      <section id="demo" className="py-28 md:py-36 px-6">
+      {/* 2. Demo */}
+      <section id="demo" className="py-24 md:py-32 px-6">
         <div className="max-w-6xl mx-auto space-y-14">
           <Reveal className="max-w-2xl">
             <h2 className="text-4xl md:text-5xl leading-tight">A conversation, not a control panel.</h2>
-            <p className="text-lg text-muted-foreground max-w-md mt-4">
-              Control your geyser the same way you'd ask someone at home.
-            </p>
           </Reveal>
           <DemoBlock onBloom={() => setBloomed(true)} soundArmedRef={soundArmedRef} />
         </div>
       </section>
 
-      {/* 3. Is this for you? */}
-      <section id="qualifies" className="scroll-mt-24 py-20 md:py-32 px-6 bg-secondary/40">
-        <div className="max-w-3xl mx-auto">
-          <Reveal>
-            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">Is this for you?</div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl mb-10 md:mb-12">A short list. Nothing hidden.</h2>
-          </Reveal>
-          <ul className="space-y-5 md:space-y-6">
-            {[
-              "You have a geyser — the first device we bring online, with more on the way.",
-              "You have Wi-Fi at home.",
-            ].map((line, i) => (
-              <Reveal key={i} delay={i * 60}>
-                <li className="flex items-start gap-4 text-base sm:text-lg">
-                  <div className="mt-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <Check className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
-                  </div>
-                  <span className="leading-relaxed">{line}</span>
-                </li>
-              </Reveal>
-            ))}
-          </ul>
-          <Reveal delay={200}>
-            <p className="text-sm text-muted-foreground italic mt-10 pl-10">
-              Not sure? Message us and we'll check together — no obligation.
-            </p>
-          </Reveal>
-          <Reveal delay={260}>
-            <div className="mt-8 pl-10">
-              {!chatActive ? (
-                <button
-                  type="button"
-                  onClick={openQualifyChat}
-                  className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
-                >
-                  Chat with us to check
-                </button>
-              ) : null}
-            </div>
-          </Reveal>
+      {/* Qualify chat drop-in */}
+      {chatActive && (
+        <section id="qualifies" className="scroll-mt-24 px-6 pb-12">
+          <div id="qualify-chat" className="max-w-xl mx-auto scroll-mt-24">
+            <QualifyChat active={chatActive} mode={chatMode} />
+          </div>
+        </section>
+      )}
 
-          {chatActive && (
-            <div id="qualify-chat" className="mt-12 max-w-xl mx-auto scroll-mt-24">
-              <QualifyChat active={chatActive} mode={chatMode} />
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* 2. Philosophy */}
-      <section className="py-32 md:py-40 px-6">
-        <Reveal className="max-w-3xl mx-auto text-center space-y-8">
-          <div className="text-xs text-muted-foreground uppercase tracking-[0.25em]">The quiet smart home</div>
-          <h2 className="text-4xl md:text-6xl leading-[1.05]">Your home shouldn't feel mechanical.</h2>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            No control panels to study. No complicated apps to manage. Just tell your home what you need.
-          </p>
-        </Reveal>
-      </section>
-
-      {/* 5. Benefits */}
-      <section id="benefits" className="py-28 md:py-36 px-6 bg-secondary/40">
-        <div className="max-w-5xl mx-auto space-y-24 md:space-y-32">
-
+      {/* 3. Benefits */}
+      <section id="benefits" className="py-24 md:py-32 px-6 bg-secondary/40">
+        <div className="max-w-5xl mx-auto space-y-20 md:space-y-28">
           {[
             {
               n: "01",
-              title: "Control it, however you like.",
-              desc: "Check status, switch it on or off, or set a schedule in plain language.",
+              title: "Ask, and it's done.",
+              desc: "Switch it on, set a time, check if it's running — in your own words.",
             },
             {
               n: "02",
-              title: "Understand what it costs.",
-              desc: "Monitor supported energy usage and get useful alerts when something's off.",
+              title: "See what you're spending.",
+              desc: "A quiet weekly rand report shows up in the chat. No app to open.",
             },
             {
               n: "03",
-              title: "Share it with your household.",
-              desc: "Give family members their own access — no shared logins, no confusion.",
+              title: "The whole home can use it.",
+              desc: "Add anyone in your household. No logins, no lost passwords.",
             },
           ].map((b, i) => (
             <Reveal key={b.n} delay={i * 80}>
               <div className="grid md:grid-cols-[auto_1fr] gap-6 md:gap-16 items-baseline">
                 <div className="text-sm text-muted-foreground tracking-widest">{b.n}</div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <h3 className="text-3xl md:text-5xl leading-tight">{b.title}</h3>
                   <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">{b.desc}</p>
                 </div>
               </div>
             </Reveal>
           ))}
+          <Reveal delay={240}>
+            <p className="text-sm text-muted-foreground italic max-w-xl">
+              Is this for you? If you have a geyser and Wi-Fi, yes.
+            </p>
+          </Reveal>
         </div>
       </section>
 
-      {/* 6. How it works */}
-      <section id="how" className="py-28 md:py-36 px-6">
+      {/* 4. How it works */}
+      <section id="how" className="py-24 md:py-32 px-6">
         <div className="max-w-6xl mx-auto">
-          <Reveal className="text-center mb-20">
+          <Reveal className="text-center mb-16">
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">How it works</div>
             <h2 className="text-4xl md:text-5xl">Three quiet steps.</h2>
           </Reveal>
           <div className="relative grid md:grid-cols-3 gap-12 md:gap-8">
             <div className="hidden md:block absolute top-8 left-[16%] right-[16%] h-px bg-border" />
             {[
-              {
-                n: "01",
-                title: "We check your home",
-                desc: "A quick compatibility check to confirm your geyser is supported.",
-              },
-              {
-                n: "02",
-                title: "An electrician installs the controller",
-                desc: "Certified, tidy, and typically done in under two hours.",
-              },
-              {
-                n: "03",
-                title: "GeyserBrain activates on WhatsApp",
-                desc: "Save the number, say hello, and you're in control.",
-              },
+              { n: "01", title: "We check your home" },
+              { n: "02", title: "An electrician fits the controller" },
+              { n: "03", title: "You start chatting on WhatsApp" },
             ].map((s, i) => (
               <Reveal key={s.n} delay={i * 100}>
                 <div className="relative text-center md:text-left">
                   <div className="relative z-10 w-16 h-16 mx-auto md:mx-0 rounded-full bg-background border border-border flex items-center justify-center text-sm tracking-widest text-muted-foreground mb-6">
                     {s.n}
                   </div>
-                  <h3 className="text-2xl mb-3">{s.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{s.desc}</p>
+                  <h3 className="text-2xl leading-snug">{s.title}</h3>
                 </div>
               </Reveal>
             ))}
           </div>
-          <Reveal delay={300}>
-            <p className="text-center text-sm text-muted-foreground mt-16">
-              Not sure if we cover your area? <button type="button" onClick={openWaitlistChat} className="underline hover:text-foreground transition">Join the waitlist</button>.
-            </p>
-          </Reveal>
         </div>
       </section>
 
-      {/* 7. Trust */}
-      <section className="py-28 md:py-36 px-6 bg-secondary/40">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center">
-          <Reveal>
-            <div className="rounded-[2.5rem] overflow-hidden shadow-soft">
-              <img
-                src={electricianImg}
-                alt="Certified electrician beside a tidy distribution board"
-                loading="lazy"
-                className="w-full h-full object-cover aspect-[4/5] duotone transition-transform duration-[1200ms] ease-out hover:scale-[1.03]"
-              />
-            </div>
-          </Reveal>
-          <Reveal delay={100}>
-            <div className="space-y-8">
-              <h2 className="text-4xl md:text-5xl leading-tight">
-                Installed properly.
-                <br />
-                <span className="italic text-muted-foreground">Designed to disappear</span> into your home.
-              </h2>
-              <ul className="space-y-4 text-lg">
-                {[
-                  "Certified installation",
-                  "Most standard electric geysers supported",
-                  "Typically installed within two hours",
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 mt-1 flex-shrink-0" strokeWidth={2} />
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* 9. Pricing */}
-      <section id="pricing" className="py-28 md:py-36 px-6 bg-primary text-primary-foreground">
+      {/* 5. Pricing */}
+      <section id="pricing" className="py-24 md:py-32 px-6 bg-primary text-primary-foreground">
         <div className="max-w-3xl mx-auto text-center space-y-10">
           <Reveal>
             <div className="text-xs uppercase tracking-[0.3em] text-primary-foreground/60">First 10 homes only</div>
@@ -935,7 +809,7 @@ function Landing() {
               <ul className="text-left space-y-3 text-sm text-primary-foreground/85">
                 {[
                   "Smart geyser controller included",
-                  "Standard electrician installation",
+                  "Certified electrician installation",
                   "GeyserBrain setup on WhatsApp",
                   "First 3 months included",
                 ].map((item) => (
@@ -946,23 +820,30 @@ function Landing() {
                 ))}
               </ul>
               <p className="text-xs text-primary-foreground/60 mt-6">
-                Thereafter {pricing.monthly}/month. Cancel anytime.
+                Then {pricing.monthly}/month. Cancel anytime.
                 {pricing.approx ? " Prices outside South Africa are estimates." : ""}
+              </p>
+              <p className="text-xs text-primary-foreground/50 mt-3">
+                You'll need a geyser and Wi-Fi at home.
               </p>
             </div>
           </Reveal>
           <Reveal delay={200}>
-            <PillLink href={wa("GEYSER")} variant="light">
-              Get started
-            </PillLink>
+            <button
+              type="button"
+              onClick={openQualifyChat}
+              className="inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-medium bg-white text-black shadow-float hover:-translate-y-0.5 transition-all"
+            >
+              Check if my home qualifies
+            </button>
           </Reveal>
         </div>
       </section>
 
-      {/* 10. FAQ */}
-      <section id="faq" className="py-28 md:py-36 px-6">
+      {/* 6. FAQ */}
+      <section id="faq" className="py-24 md:py-32 px-6">
         <div className="max-w-3xl mx-auto">
-          <Reveal className="text-center mb-16">
+          <Reveal className="text-center mb-14">
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">FAQ</div>
             <h2 className="text-4xl md:text-5xl">Quiet answers.</h2>
           </Reveal>
@@ -1015,8 +896,8 @@ function Landing() {
         </div>
       </section>
 
-      {/* 11. Final */}
-      <section className="relative h-[85vh] min-h-[560px] w-full overflow-hidden">
+      {/* 7. Final */}
+      <section className="relative h-[85vh] min-h-[520px] w-full overflow-hidden">
         <img
           src={homeImg}
           alt="A modern home in soft light"
@@ -1031,9 +912,6 @@ function Landing() {
               <br />
               <span className="italic text-white/85">Switch on soft life.</span>
             </h2>
-            <p className="text-base md:text-lg text-white/80 max-w-md mx-auto">
-              Your home handles the routine. You enjoy the comfort.
-            </p>
             <div className="pt-2 flex justify-center">
               <button
                 type="button"
@@ -1047,48 +925,11 @@ function Landing() {
         </div>
       </section>
 
-      {/* 2b. Why WhatsApp? */}
-      <section className="py-24 md:py-32 px-6 border-t border-border/50">
-        <div className="max-w-5xl mx-auto">
-          <Reveal className="max-w-2xl mb-14 md:mb-20">
-            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">Why WhatsApp?</div>
-            <h2 className="text-4xl md:text-5xl leading-[1.05]">The habit's already there.</h2>
-          </Reveal>
-          <div className="space-y-14 md:space-y-20">
-            {[
-              {
-                headline: "You'll actually catch it before it costs you.",
-                body: "Alerts land in the chat you already check — not a dashboard you forget to open. A geyser left on gets caught in time, not discovered on next month's bill.",
-              },
-              {
-                headline: "Your savings show up on their own.",
-                body: "The weekly rand report arrives automatically — no login, no app to check for proof it's working.",
-              },
-              {
-                headline: "An app is one more icon competing for attention. This isn't.",
-                body: "Savings only happen if you keep using the thing — and WhatsApp doesn't ask you to build a new habit to get there.",
-              },
-            ].map((item, i) => (
-              <Reveal key={i} delay={i * 80}>
-                <div className="grid md:grid-cols-[auto_1fr] gap-4 md:gap-12 items-baseline">
-                  <div className="text-sm text-muted-foreground tracking-widest">0{i + 1}</div>
-                  <div className="space-y-3 max-w-2xl">
-                    <h3 className="text-2xl md:text-4xl leading-tight">{item.headline}</h3>
-                    <p className="text-lg text-muted-foreground leading-relaxed">{item.body}</p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 12. Footer */}
-
+      {/* Footer */}
       <footer className="py-12 px-6 border-t border-border/60">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <img src={logoAsset.url} alt="GeyserBrain" className="h-7 w-auto" />
+            <img src={logoAsset} alt="GeyserBrain" className="h-7 w-auto" />
             <span className="text-foreground font-medium">GeyserBrain</span>
           </div>
           <div className="flex items-center gap-6">
@@ -1107,3 +948,4 @@ function Landing() {
     </div>
   );
 }
+
