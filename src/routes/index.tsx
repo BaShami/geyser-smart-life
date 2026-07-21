@@ -702,7 +702,7 @@ function Landing() {
           </div>
         </div>
         {menuOpen && (
-          <div className="md:hidden mt-3 flex flex-col gap-2">
+          <div className="md:hidden mt-3 flex flex-col items-end gap-2">
             {[
               { href: "#benefits", label: "Benefits" },
               { href: "#how", label: "How it works" },
@@ -713,13 +713,14 @@ function Landing() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setMenuOpen(false)}
-                className="block px-5 py-3 rounded-2xl text-sm font-medium text-foreground bg-white/25 backdrop-blur-xl border border-white/40 shadow-soft hover:bg-white/40 transition"
+                className="w-auto px-4 py-2 rounded-xl text-xs font-medium text-right text-foreground bg-white/5 backdrop-blur-md border border-white/50 shadow-sm hover:bg-white/10 transition"
               >
                 {l.label}
               </a>
             ))}
           </div>
         )}
+
 
       </header>
 
