@@ -662,7 +662,7 @@ function Landing() {
 
       {/* Nav */}
       <header className="fixed top-3 md:top-4 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-5xl">
-        <div className="rounded-full bg-white/70 backdrop-blur-xl border border-border/60 shadow-soft pl-3 pr-3 md:pl-5 md:pr-5 py-2 md:py-3 flex items-center justify-between gap-3">
+        <div className="rounded-full bg-white/25 backdrop-blur-xl border border-white/40 shadow-soft pl-3 pr-3 md:pl-5 md:pr-5 py-2 md:py-3 flex items-center justify-between gap-3">
           <a href="#" className="flex items-center gap-2 font-medium min-w-0">
             <img src={logoAsset} alt="GeyserBrain" className="h-7 md:h-8 w-auto shrink-0" />
             <span className="hidden sm:inline truncate">GeyserBrain</span>
@@ -693,7 +693,7 @@ function Landing() {
             <button
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
-              className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-full border border-border/60 bg-white/60 hover:bg-white transition"
+              className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-full border border-white/40 bg-white/25 backdrop-blur-xl hover:bg-white/40 transition"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
             >
@@ -702,7 +702,7 @@ function Landing() {
           </div>
         </div>
         {menuOpen && (
-          <div className="md:hidden mt-2 rounded-2xl bg-white/90 backdrop-blur-xl border border-border/60 shadow-soft p-2">
+          <div className="md:hidden mt-3 flex flex-col gap-2">
             {[
               { href: "#benefits", label: "Benefits" },
               { href: "#how", label: "How it works" },
@@ -713,13 +713,14 @@ function Landing() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setMenuOpen(false)}
-                className="block px-4 py-3 rounded-xl text-sm text-foreground hover:bg-muted transition"
+                className="block px-5 py-3 rounded-2xl text-sm font-medium text-foreground bg-white/25 backdrop-blur-xl border border-white/40 shadow-soft hover:bg-white/40 transition"
               >
                 {l.label}
               </a>
             ))}
           </div>
         )}
+
       </header>
 
       {/* 1. Hero */}
