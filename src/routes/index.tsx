@@ -662,22 +662,22 @@ function Landing() {
 
       {/* Nav */}
       <header className="fixed top-3 md:top-4 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-5xl">
-        <div className="rounded-full bg-white/25 backdrop-blur-xl border border-white/40 shadow-soft pl-3 pr-3 md:pl-5 md:pr-5 py-2 md:py-3 flex items-center justify-between gap-3">
-          <a href="#" className="flex items-center gap-2 font-medium min-w-0">
+        <div className="rounded-full bg-white/75 backdrop-blur-xl border border-white/80 shadow-soft pl-3 pr-3 md:pl-5 md:pr-5 py-2 md:py-3 flex items-center justify-between gap-3">
+          <a href="#" className="flex items-center gap-2 font-medium min-w-0 text-neutral-900">
             <img src={logoAsset} alt="GeyserBrain" className="h-7 md:h-8 w-auto shrink-0" />
             <span className="hidden sm:inline truncate">GeyserBrain</span>
           </a>
-          <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-            <a href="#benefits" className="hover:text-foreground transition">
+          <nav className="hidden md:flex items-center gap-8 text-sm text-neutral-700">
+            <a href="#benefits" className="hover:text-neutral-950 transition">
               Benefits
             </a>
-            <a href="#how" className="hover:text-foreground transition">
+            <a href="#how" className="hover:text-neutral-950 transition">
               How it works
             </a>
-            <a href="#pricing" className="hover:text-foreground transition">
+            <a href="#pricing" className="hover:text-neutral-950 transition">
               Pricing
             </a>
-            <a href="#faq" className="hover:text-foreground transition">
+            <a href="#faq" className="hover:text-neutral-950 transition">
               FAQ
             </a>
           </nav>
