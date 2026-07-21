@@ -88,6 +88,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "Smart home. Soft life. Check, control, schedule and understand what your geyser costs — all from WhatsApp." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/9404a855-e536-4d2a-b107-b33958cccc13" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/9404a855-e536-4d2a-b107-b33958cccc13" },
+      { name: "google-site-verification", content: "lsRm867qdQfqDNCrQgwweWA3qZfUSOwW9vrOT2C03gI" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
