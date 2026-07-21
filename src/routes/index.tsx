@@ -693,7 +693,7 @@ function Landing() {
             <button
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
-              className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-full border border-white/40 bg-white/25 backdrop-blur-xl hover:bg-white/40 transition"
+              className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-full border border-white/80 bg-white/75 backdrop-blur-xl text-neutral-900 hover:bg-white/90 transition"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
             >
