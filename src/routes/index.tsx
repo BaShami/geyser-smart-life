@@ -573,45 +573,24 @@ type Faq = { q: string; a: string; action?: "waitlist" };
 
 const faqs: Faq[] = [
   {
-    q: "Do I need to download an app?",
-    a: "No. GeyserBrain works entirely through WhatsApp — the app you already have. Save the number and message it like you'd message anyone else.",
-  },
-  {
-    q: "Which devices does it work with today?",
-    a: "We're a smart home company at heart. Today, that means your geyser — your home's biggest electricity cost. More devices are on our roadmap.",
-  },
-  {
-    q: "Is this available where I am?",
-    a: "We're expanding steadily. Message us and we'll confirm availability for your area — if we're not there yet, we'll add you to the waitlist.",
-    action: "waitlist",
-  },
-  {
     q: "How long does installation take?",
-    a: "A certified electrician typically completes installation in under two hours, with minimal disruption to your home.",
-  },
-  {
-    q: "Is my data private?",
-    a: "Yes. Only you and the people you invite can control your geyser. We never share your usage data.",
-  },
-  {
-    q: "Can I cancel anytime?",
-    a: "Yes. The monthly service is month-to-month with no lock-in after the first three months included in your install.",
-  },
-  {
-    q: "What if I rent my home?",
-    a: "You'll need permission from your landlord or body corporate, since installation involves your home's distribution board.",
-  },
-  {
-    q: "Do I need to already own a smart switch?",
-    a: "No — the smart controller is included in your once-off price and fitted by our electrician.",
-  },
-  {
-    q: "What happens during load-shedding?",
-    a: "GeyserBrain doesn't yet sync with load-shedding schedules — that's on our roadmap. Manual control and your schedules resume automatically once power returns.",
+    a: "Usually under two hours. A certified electrician handles it — you barely notice it happen.",
   },
   {
     q: "What if my home doesn't qualify?",
-    a: "You get a full refund. If we can't install for any technical reason, we return your payment in full — no questions asked.",
+    a: "You get a full refund. No questions, no forms.",
+  },
+  {
+    q: "Can I cancel anytime?",
+    a: "Yes. Month-to-month, no lock-in.",
+  },
+  {
+    q: "Is my data private?",
+    a: "Yes. Only you and the people you invite can control your geyser. We never share your usage.",
+  },
+  {
+    q: "What if I rent my home?",
+    a: "You'll need your landlord's OK — the install touches your distribution board.",
   },
 ];
 
