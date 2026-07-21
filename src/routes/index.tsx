@@ -820,19 +820,19 @@ function Landing() {
       <section id="pricing" className="py-24 md:py-32 px-6 bg-primary text-primary-foreground">
         <div className="max-w-3xl mx-auto text-center space-y-10">
           <Reveal>
-            <div className="text-xs uppercase tracking-[0.3em] text-primary-foreground/60">First 10 homes only</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-primary-foreground/80">First 10 homes only</div>
           </Reveal>
           <Reveal delay={80}>
             <div>
               <div className="text-6xl md:text-8xl tracking-tight leading-none">{pricing.install}</div>
-              <div className="text-primary-foreground/70 mt-3">
+              <div className="text-primary-foreground/85 mt-3">
                 installed{pricing.currency === "ZAR" ? " (incl. VAT)" : ""}
               </div>
             </div>
           </Reveal>
           <Reveal delay={140}>
-            <div className="max-w-md mx-auto pt-6 border-t border-primary-foreground/15">
-              <ul className="text-left space-y-3 text-sm text-primary-foreground/85">
+            <div className="max-w-md mx-auto pt-6 border-t border-primary-foreground/25">
+              <ul className="text-left space-y-3 text-sm text-primary-foreground">
                 {[
                   "Smart geyser controller included",
                   "Certified electrician installation",
@@ -845,13 +845,14 @@ function Landing() {
                   </li>
                 ))}
               </ul>
-              <p className="text-xs text-primary-foreground/60 mt-6">
+              <p className="text-xs text-primary-foreground/85 mt-6">
                 Then {pricing.monthly}/month. Cancel anytime.
                 {pricing.approx ? " Prices outside South Africa are estimates." : ""}
               </p>
-              <p className="text-xs text-primary-foreground/50 mt-3">
+              <p className="text-xs text-primary-foreground/80 mt-3">
                 You'll need a geyser and Wi-Fi at home.
               </p>
+
             </div>
           </Reveal>
           <Reveal delay={200}>
