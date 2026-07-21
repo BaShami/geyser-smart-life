@@ -11,6 +11,9 @@ import { QualifyChat } from "@/components/QualifyChat";
 export const Route = createFileRoute("/")({
   component: Landing,
   head: () => ({
+    links: [
+      { rel: "preload", as: "image", href: heroImg, fetchpriority: "high" },
+    ],
     scripts: [
       {
         type: "application/ld+json",
@@ -26,6 +29,7 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
+
 });
 
 
