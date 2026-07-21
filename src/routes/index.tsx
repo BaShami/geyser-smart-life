@@ -5,7 +5,7 @@ import heroImg from "@/assets/hero.jpg";
 import electricianImg from "@/assets/electrician.jpg";
 import homeImg from "@/assets/home.jpg";
 import reactionVideo from "@/assets/reaction.mp4.asset.json";
-import logoAsset from "@/assets/geyserbrain-logo.png.asset.json";
+import logoAsset from "@/assets/geyserbrain-logo.png";
 import { QualifyChat } from "@/components/QualifyChat";
 
 export const Route = createFileRoute("/")({
