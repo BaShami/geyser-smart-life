@@ -713,7 +713,7 @@ function Landing() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setMenuOpen(false)}
-                className="w-auto px-4 py-2 rounded-xl text-xs font-medium text-right text-foreground bg-white/5 backdrop-blur-md border border-white/50 shadow-sm hover:bg-white/10 transition"
+                className="w-auto px-4 py-2 rounded-xl text-xs font-medium text-right text-neutral-900 bg-white/85 backdrop-blur-xl border border-white/90 shadow-soft hover:bg-white transition"
               >
                 {l.label}
               </a>
