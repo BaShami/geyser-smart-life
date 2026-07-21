@@ -1,0 +1,9 @@
+# GeyserBrain
+
+> Smart home. Soft life. Check, control, schedule and understand what your geyser costs — all from WhatsApp.
+
+GeyserBrain brings your home online one device at a time, starting with your geyser. You talk to it in plain language on WhatsApp — no new app, no dashboard, no manual. Ask it to heat up, check what it's costing, or set a schedule, and it just does it.
+
+## Pages
+
+- [Home](/): Product overview, WhatsApp demo, benefits, how it works, pricing, and FAQ.
