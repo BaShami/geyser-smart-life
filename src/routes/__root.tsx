@@ -95,6 +95,33 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": "https://geyserbrain.com/#organization",
+              name: "GeyserBrain",
+              url: "https://geyserbrain.com",
+              description:
+                "Smart home. Soft life. Check, control, schedule and understand what your geyser costs — all from WhatsApp.",
+              logo: "https://geyserbrain.com/favicon.ico",
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://geyserbrain.com/#website",
+              url: "https://geyserbrain.com",
+              name: "GeyserBrain",
+              publisher: { "@id": "https://geyserbrain.com/#organization" },
+            },
+          ],
+        }),
+      },
+    ],
+
   }),
   shellComponent: RootShell,
   component: RootComponent,
