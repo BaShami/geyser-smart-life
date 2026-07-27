@@ -17,7 +17,7 @@ import {
 import heroImg from "@/assets/hero.jpg";
 import reactionVideo from "@/assets/reaction.mp4.asset.json";
 import logoAsset from "@/assets/geyserbrain-logo.png";
-import { LeadDrawer } from "@/components/LeadDrawer";
+import { LeadDrawer, DRAWER_STATE_KEY } from "@/components/LeadDrawer";
 import { QualifyChat } from "@/components/QualifyChat";
 import { useCountry } from "@/hooks/use-country";
 import {
