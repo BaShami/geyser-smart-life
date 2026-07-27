@@ -754,7 +754,7 @@ function Landing() {
         <div className="max-w-3xl mx-auto">
           <Reveal className="text-center mb-8">
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">FAQ</div>
-            <h2 className="text-2xl md:text-4xl">Quiet answers.</h2>
+            <h2 className="text-2xl md:text-4xl">Common questions.</h2>
           </Reveal>
           <div className="space-y-3">
             {faqs.map((f, i) => {
@@ -818,14 +818,14 @@ function Landing() {
       <footer className="py-8 px-6 border-t border-border/60">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
-            <img src={logoAsset} alt="GeyserBrain" className="h-6 w-auto" />
-            <span className="text-foreground font-medium">GeyserBrain</span>
+            <img src={logoAsset} alt="HomeChat" className="h-6 w-auto" />
+            <span className="text-foreground font-medium">HomeChat</span>
           </div>
           <div className="flex items-center gap-6">
             <a href="/privacy" className="hover:text-foreground">Privacy</a>
             <a href="/terms" className="hover:text-foreground">Terms</a>
           </div>
-          <p>© {new Date().getFullYear()} GeyserBrain</p>
+          <p>© {new Date().getFullYear()} HomeChat</p>
         </div>
       </footer>
 
