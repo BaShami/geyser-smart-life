@@ -7,7 +7,48 @@ const WA_NUMBER = "27744224646";
 const wa = (text: string) =>
   `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
 
+export const DRAWER_STATE_KEY = "gb_drawer_state_v1";
+
 type Step = "contact" | "location" | "details" | "done";
+
+type PersistedState = {
+  open: boolean;
+  device: DeviceId | null;
+  step: Step;
+  leadId: string | null;
+  shortId: string | null;
+  contactMode: "phone" | "email";
+  phone: string;
+  email: string;
+  name: string;
+  city: string;
+  owns: string | null;
+  hasWifi: boolean | null;
+};
+
+function loadPersisted(): PersistedState | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(DRAWER_STATE_KEY);
+    return raw ? (JSON.parse(raw) as PersistedState) : null;
+  } catch {
+    return null;
+  }
+}
+
+function savePersisted(state: PersistedState) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(DRAWER_STATE_KEY, JSON.stringify(state));
+  } catch {}
+}
+
+function clearPersisted() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(DRAWER_STATE_KEY);
+  } catch {}
+}
 
 type Props = {
   open: boolean;
@@ -39,15 +80,51 @@ export function LeadDrawer({ open, onClose, device, country }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const openedForDeviceRef = useRef<string | null>(null);
+  const inputStartedRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // On open: track + create the lead with device selection
+  // On open: hydrate from persisted state (same device) OR initialize new lead
   useEffect(() => {
     if (!open || !device) return;
     if (openedForDeviceRef.current === device) return;
     openedForDeviceRef.current = device;
-    setStep("contact");
     setError(null);
+    inputStartedRef.current = false;
+
+    const persisted = loadPersisted();
+    if (persisted && persisted.device === device && persisted.leadId) {
+      // Restore
+      setStep(persisted.step);
+      setLeadId(persisted.leadId);
+      setShortId(persisted.shortId);
+      setContactMode(persisted.contactMode);
+      setPhone(persisted.phone);
+      setEmail(persisted.email);
+      setName(persisted.name);
+      setCity(persisted.city);
+      setOwns(persisted.owns);
+      setHasWifi(persisted.hasWifi);
+      track({
+        event_name: "drawer_resumed",
+        funnel_step: persisted.step,
+        selected_device: device,
+        country,
+        lead_id: persisted.leadId,
+      });
+      setTimeout(() => inputRef.current?.focus(), 200);
+      return;
+    }
+
+    // Fresh open
+    setStep("contact");
+    setLeadId(null);
+    setShortId(null);
+    setPhone("");
+    setEmail("");
+    setName("");
+    setCity("");
+    setOwns(null);
+    setHasWifi(null);
     track({
       event_name: "device_selected",
       funnel_step: "device",
@@ -80,21 +157,46 @@ export function LeadDrawer({ open, onClose, device, country }: Props) {
     if (!open) openedForDeviceRef.current = null;
   }, [open]);
 
+  // Persist state to localStorage on every change
+  useEffect(() => {
+    if (!open || !device) return;
+    savePersisted({
+      open,
+      device,
+      step,
+      leadId,
+      shortId,
+      contactMode,
+      phone,
+      email,
+      name,
+      city,
+      owns,
+      hasWifi,
+    });
+  }, [open, device, step, leadId, shortId, contactMode, phone, email, name, city, owns, hasWifi]);
+
   const isValidPhone = phone.replace(/\D/g, "").length >= 9;
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const contactValid = contactMode === "phone" ? isValidPhone : isValidEmail;
 
-  async function submitContact() {
-    if (!contactValid || saving) return;
-    setSaving(true);
-    setError(null);
+  function trackInputStartedOnce() {
+    if (inputStartedRef.current) return;
+    inputStartedRef.current = true;
     track({
       event_name: "contact_input_started",
       funnel_step: "contact",
       selected_device: device,
       country,
       lead_id: leadId,
+      metadata: { method: contactMode },
     });
+  }
+
+  async function submitContact() {
+    if (!contactValid || saving) return;
+    setSaving(true);
+    setError(null);
     const patch =
       contactMode === "phone"
         ? { phone: phone.trim(), current_step: "location", last_completed_step: "contact", lead_status: "contact_captured" }
@@ -151,6 +253,32 @@ export function LeadDrawer({ open, onClose, device, country }: Props) {
     });
   }
 
+  async function skipLocation() {
+    if (saving) return;
+    setSaving(true);
+    await saveLead({
+      current_step: "details",
+      last_completed_step: "location",
+      lead_status: "location_skipped",
+    });
+    setSaving(false);
+    track({
+      event_name: "location_skipped",
+      funnel_step: "location",
+      selected_device: device,
+      country,
+      lead_id: leadId,
+    });
+    setStep("details");
+    track({
+      event_name: "details_step_viewed",
+      funnel_step: "details",
+      selected_device: device,
+      country,
+      lead_id: leadId,
+    });
+  }
+
   async function submitDetails() {
     if (saving) return;
     setSaving(true);
@@ -185,6 +313,7 @@ export function LeadDrawer({ open, onClose, device, country }: Props) {
       lead_id: leadId,
     });
     saveLead({ lead_status: "whatsapp_clicked" });
+    clearPersisted();
   }
 
   function handleClose() {
@@ -195,6 +324,24 @@ export function LeadDrawer({ open, onClose, device, country }: Props) {
       country,
       lead_id: leadId,
     });
+    if (step === "done") clearPersisted();
+    else if (device) {
+      // Mark closed but keep progress so refresh can restore intent explicitly
+      savePersisted({
+        open: false,
+        device,
+        step,
+        leadId,
+        shortId,
+        contactMode,
+        phone,
+        email,
+        name,
+        city,
+        owns,
+        hasWifi,
+      });
+    }
     onClose();
   }
 
@@ -265,7 +412,10 @@ export function LeadDrawer({ open, onClose, device, country }: Props) {
                   inputMode="tel"
                   placeholder="e.g. +27 72 000 0000"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    trackInputStartedOnce();
+                    setPhone(e.target.value);
+                  }}
                   className="w-full rounded-2xl border border-border px-4 py-3 text-base bg-background"
                 />
               ) : (
@@ -275,7 +425,10 @@ export function LeadDrawer({ open, onClose, device, country }: Props) {
                   autoComplete="email"
                   placeholder="you@example.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    trackInputStartedOnce();
+                    setEmail(e.target.value);
+                  }}
                   className="w-full rounded-2xl border border-border px-4 py-3 text-base bg-background"
                 />
               )}
@@ -325,8 +478,9 @@ export function LeadDrawer({ open, onClose, device, country }: Props) {
                 Continue <ArrowRight className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setStep("details")}
-                className="w-full text-xs text-muted-foreground underline"
+                onClick={skipLocation}
+                disabled={saving}
+                className="w-full text-xs text-muted-foreground underline disabled:opacity-50"
               >
                 Skip for now
               </button>
