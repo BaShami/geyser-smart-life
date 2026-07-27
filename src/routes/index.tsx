@@ -32,24 +32,28 @@ import { track, getSessionId, ensureUtmCapture } from "@/lib/session";
 
 const WA_NUMBER = "27744224646";
 const wa = (text: string) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
-const WA_HELLO = "Hi GeyserBrain — I'd like to talk about smart home control.";
+const WA_HELLO = "Hi HomeChat — I'd like to talk about smart home control.";
 
 const faqs = [
   {
-    q: "What can GeyserBrain control right now?",
-    a: "Smart light control, smart geyser control, and smart plugs & appliances are available now. Gates & security are fitted after a custom assessment of your existing equipment.",
+    q: "What can HomeChat control right now?",
+    a: "Smart lights, smart geyser control, and smart plugs & appliances are available now. Gates & security are fitted after a short custom assessment of what you already have.",
   },
   {
-    q: "Where is GeyserBrain available?",
+    q: "What exactly gets installed?",
+    a: "A small smart controller that a certified electrician wires in (usually behind your switch, geyser isolator or plug). It connects to your Wi-Fi and talks to HomeChat. Nothing visible changes in your home — your walls and fittings stay the same.",
+  },
+  {
+    q: "Where is HomeChat available?",
     a: AVAILABILITY_LINE + " Other countries: get in touch and we'll check availability.",
   },
   {
     q: "How do the payment options work?",
-    a: "Pay once for hardware and installation, or spread the same amount over 4 monthly payments. The instalment plan is for the hardware and installation only — it isn't a cancel-anytime subscription.",
+    a: "It's a one-time cost for hardware and professional installation — not a subscription. Pay it once, or split the same amount over 4 monthly payments. Nothing to cancel later.",
   },
   {
     q: "How long does installation take?",
-    a: "Usually 1–2 hours per device. A certified electrician fits the controller and hands over your WhatsApp setup.",
+    a: "Usually 1–2 hours per device. A certified electrician fits the controller, tests it and walks you through your first WhatsApp messages before leaving.",
   },
 ];
 
@@ -275,7 +279,7 @@ function CompactDemo() {
           <div className="px-4 py-3 flex items-center gap-3" style={{ backgroundColor: "#075E54", color: "white" }}>
             <div className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center font-semibold">G</div>
             <div>
-              <div className="text-sm font-semibold leading-tight">GeyserBrain</div>
+              <div className="text-sm font-semibold leading-tight">HomeChat</div>
               <div className="text-[11px] text-white/80 h-[14px]">{typing ? "typing…" : "online"}</div>
             </div>
           </div>
@@ -465,8 +469,8 @@ function Landing() {
       <header className="fixed top-3 md:top-4 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-5xl">
         <div className="rounded-full bg-white/80 backdrop-blur-xl border border-white/80 shadow-soft pl-3 pr-3 md:pl-5 md:pr-5 py-2 md:py-3 flex items-center justify-between gap-3">
           <a href="#" className="flex items-center gap-2 font-medium min-w-0 text-neutral-900">
-            <img src={logoAsset} alt="GeyserBrain" className="h-7 md:h-8 w-auto shrink-0" />
-            <span className="hidden sm:inline truncate">GeyserBrain</span>
+            <img src={logoAsset} alt="HomeChat" className="h-7 md:h-8 w-auto shrink-0" />
+            <span className="hidden sm:inline truncate">HomeChat</span>
           </a>
           <nav className="hidden md:flex items-center gap-7 text-sm text-neutral-700">
             <a href="#devices" className="hover:text-neutral-950">Devices</a>
