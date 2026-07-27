@@ -11,7 +11,7 @@ type Props = {
   country: CountryCode;
 };
 
-const OPENER = "Ask me anything about GeyserBrain — devices, pricing or install.";
+const OPENER = "Ask me anything about HomeChat — devices, pricing or install.";
 
 export function QualifyChat({ device, country }: Props) {
   const [messages, setMessages] = useState<Msg[]>([
