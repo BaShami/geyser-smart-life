@@ -108,8 +108,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               name: "GeyserBrain",
               url: "https://geyserbrain.com",
               description:
-                "Smart home. Soft life. Check, control, schedule and understand what your geyser costs — all from WhatsApp.",
+                "Affordable WhatsApp smart-home control — lights, geysers, plugs and more. Available in South Africa, Zimbabwe and Zambia.",
               logo: "https://geyserbrain.com/favicon.ico",
+              areaServed: [
+                { "@type": "Country", name: "South Africa" },
+                { "@type": "Country", name: "Zimbabwe" },
+                { "@type": "Country", name: "Zambia" },
+              ],
             },
             {
               "@type": "WebSite",

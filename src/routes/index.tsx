@@ -1,86 +1,59 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, MessageCircle, Volume2, VolumeX, Play, Pause, RotateCcw, Menu, X } from "lucide-react";
+import {
+  ChevronDown,
+  MessageCircle,
+  Volume2,
+  VolumeX,
+  Play,
+  Pause,
+  RotateCcw,
+  Menu,
+  X,
+  MessagesSquare,
+  Clock,
+  Gauge,
+} from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
-
-import homeImg from "@/assets/home.jpg";
 import reactionVideo from "@/assets/reaction.mp4.asset.json";
 import logoAsset from "@/assets/geyserbrain-logo.png";
+import { LeadDrawer } from "@/components/LeadDrawer";
 import { QualifyChat } from "@/components/QualifyChat";
-
-export const Route = createFileRoute("/")({
-  component: Landing,
-  head: () => ({
-    links: [
-      { rel: "preload", as: "image", href: heroImg, fetchpriority: "high" },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: faqs.map((f) => ({
-            "@type": "Question",
-            name: f.q,
-            acceptedAnswer: { "@type": "Answer", text: f.a },
-          })),
-        }),
-      },
-    ],
-  }),
-
-});
-
-
-import { useCurrency } from "@/hooks/use-currency";
+import { useCountry } from "@/hooks/use-country";
+import {
+  COUNTRY_PRICING,
+  DEVICES,
+  AVAILABILITY_LINE,
+  pricingFor,
+  type CountryCode,
+  type DeviceId,
+} from "@/lib/pricing";
+import { track, getSessionId, ensureUtmCapture } from "@/lib/session";
 
 const WA_NUMBER = "27744224646";
 const wa = (text: string) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
-const WA_HELLO = "Hi GeyserBrain — I'd like to control my home devices through WhatsApp.";
+const WA_HELLO = "Hi GeyserBrain — I'd like to talk about smart home control.";
 
-// Timothy: set to the exact second in reaction.mp4 where the visible reaction happens.
-// Until set, the bloom triggers when message 4 ("Done. It's heating now.") appears.
-const REACTION_TIMESTAMP: number | null = null;
-
-/* ---------- primitives ---------- */
-
-function PillLink({
-  href,
-  children,
-  variant = "primary",
-  className = "",
-  onClick,
-}: {
-  href: string;
-  children: React.ReactNode;
-  variant?: "primary" | "light" | "ghost";
-  className?: string;
-  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
-}) {
-  const base =
-    "inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-medium transition-all duration-150 hover:-translate-y-0.5";
-  const styles =
-    variant === "primary"
-      ? "bg-primary text-primary-foreground shadow-soft hover:shadow-float"
-      : variant === "light"
-        ? "bg-white text-black shadow-float hover:shadow-float"
-        : "bg-transparent text-foreground border border-border/70 hover:bg-secondary";
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={onClick}
-      className={`${base} ${styles} ${className}`}
-    >
-      {children}
-    </a>
-  );
-}
+const faqs = [
+  {
+    q: "What can GeyserBrain control right now?",
+    a: "Smart light control, smart geyser control, and smart plugs & appliances are available now. Gates & security are fitted after a custom assessment of your existing equipment.",
+  },
+  {
+    q: "Where is GeyserBrain available?",
+    a: AVAILABILITY_LINE + " Other countries: get in touch and we'll check availability.",
+  },
+  {
+    q: "How do the payment options work?",
+    a: "Pay once for hardware and installation, or spread the same amount over 4 monthly payments. The instalment plan is for the hardware and installation only — it isn't a cancel-anytime subscription.",
+  },
+  {
+    q: "How long does installation take?",
+    a: "Usually 1–2 hours per device. A certified electrician fits the controller and hands over your WhatsApp setup.",
+  },
+];
 
 /* ---------- Reveal ---------- */
-
 function Reveal({
   children,
   className = "",
@@ -96,8 +69,8 @@ function Reveal({
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
+      ([e]) => {
+        if (e.isIntersecting) {
           setShown(true);
           io.disconnect();
         }
@@ -120,34 +93,32 @@ function Reveal({
   );
 }
 
-/* ---------- WhatsApp demo + reaction video ---------- */
-
+/* ---------- Compact WhatsApp demo ---------- */
 type Msg = { from: "me" | "them"; text: string };
 const SCRIPT: Msg[] = [
   { from: "me", text: "Is the geyser on right now?" },
   { from: "them", text: "It's off at the moment." },
   { from: "me", text: "Switch it on — I need a shower." },
   { from: "them", text: "Done. It's heating now." },
-  { from: "me", text: "Can you have it ready every weekday at 6am too?" },
-  { from: "them", text: "Got it — set for every weekday at 6am." },
+  { from: "me", text: "Set it for every weekday at 6am too." },
+  { from: "them", text: "Got it — weekday 6am schedule saved." },
 ];
 const TIMES = ["09:41", "09:41", "09:42", "09:42", "09:43", "09:43"];
 const REACTION_MSG_INDEX = 3;
 
 type Step = { type: "delay"; ms: number } | { type: "typing"; on: boolean } | { type: "send"; index: number };
-
 function buildSteps(): Step[] {
   const s: Step[] = [];
   SCRIPT.forEach((m, i) => {
     if (m.from === "them") {
-      s.push({ type: "delay", ms: 500 });
+      s.push({ type: "delay", ms: 400 });
       s.push({ type: "typing", on: true });
-      s.push({ type: "delay", ms: 900 });
+      s.push({ type: "delay", ms: 700 });
       s.push({ type: "typing", on: false });
     }
-    s.push({ type: "delay", ms: 300 });
+    s.push({ type: "delay", ms: 250 });
     s.push({ type: "send", index: i });
-    s.push({ type: "delay", ms: 900 });
+    s.push({ type: "delay", ms: 700 });
   });
   return s;
 }
@@ -157,7 +128,7 @@ function DoubleCheck({ read }: { read: boolean }) {
   return (
     <svg
       viewBox="0 0 16 15"
-      className={`w-[14px] h-[10px] ${read ? "text-[#53BDEB]" : "text-neutral-400"}`}
+      className={`w-[13px] h-[9px] ${read ? "text-[#53BDEB]" : "text-neutral-400"}`}
       fill="currentColor"
       aria-hidden
     >
@@ -167,45 +138,23 @@ function DoubleCheck({ read }: { read: boolean }) {
   );
 }
 
-function DemoBlock({
-  onBloom,
-  soundArmedRef,
-}: {
-  onBloom: () => void;
-  soundArmedRef: React.MutableRefObject<boolean>;
-}) {
-  const sectionRef = useRef<HTMLDivElement>(null);
+function CompactDemo() {
   const videoRef = useRef<HTMLVideoElement>(null);
-
   const [visibleIdx, setVisibleIdx] = useState<number[]>([]);
   const [typing, setTyping] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [finished, setFinished] = useState(false);
   const [muted, setMuted] = useState(true);
-  const [showCaption, setShowCaption] = useState(false);
-  const [bloomedLocal, setBloomedLocal] = useState(false);
-  const [reduce, setReduce] = useState(false);
 
   const stepIRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const timerStartedAtRef = useRef(0);
-  const timerRemainingRef = useRef(0);
-  const startedOnceRef = useRef(false);
-  const bloomedRef = useRef(false);
-
-  const triggerBloom = useCallback(() => {
-    if (bloomedRef.current) return;
-    bloomedRef.current = true;
-    setBloomedLocal(true);
-    setShowCaption(true);
-    onBloom();
-  }, [onBloom]);
+  const remainingRef = useRef(0);
+  const startedAtRef = useRef(0);
+  const soundArmedRef = useRef(false);
 
   const clearTimer = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = null;
   };
 
   const runStep = useCallback(() => {
@@ -216,41 +165,32 @@ function DemoBlock({
         continue;
       }
       if (step.type === "send") {
-        const idx = step.index;
-        setVisibleIdx((v) => (v.includes(idx) ? v : [...v, idx]));
-        if (idx === REACTION_MSG_INDEX) {
+        setVisibleIdx((v) => (v.includes(step.index) ? v : [...v, step.index]));
+        if (step.index === REACTION_MSG_INDEX) {
           const v = videoRef.current;
           if (v) {
-            const armed = soundArmedRef.current;
-            v.muted = !armed;
-            setMuted(!armed);
+            v.muted = !soundArmedRef.current;
+            setMuted(!soundArmedRef.current);
             v.play().catch(() => {
               v.muted = true;
               setMuted(true);
               v.play().catch(() => {});
             });
           }
-          if (REACTION_TIMESTAMP == null) triggerBloom();
         }
         continue;
       }
-      // delay
-      timerStartedAtRef.current = Date.now();
-      timerRemainingRef.current = step.ms;
+      startedAtRef.current = Date.now();
+      remainingRef.current = step.ms;
       timerRef.current = setTimeout(runStep, step.ms);
       return;
     }
-    // Done
     setPlaying(false);
     setFinished(true);
     setTyping(false);
-    const v = videoRef.current;
-    if (v && !v.paused) {
-      // let video finish naturally; don't force pause
-    }
-  }, [soundArmedRef, triggerBloom]);
+  }, []);
 
-  const startSequence = useCallback(() => {
+  const start = useCallback(() => {
     clearTimer();
     stepIRef.current = 0;
     setVisibleIdx([]);
@@ -260,105 +200,43 @@ function DemoBlock({
     runStep();
   }, [runStep]);
 
-  const pauseAll = useCallback(() => {
+  const pause = () => {
     clearTimer();
-    timerRemainingRef.current = Math.max(0, timerRemainingRef.current - (Date.now() - timerStartedAtRef.current));
+    remainingRef.current = Math.max(0, remainingRef.current - (Date.now() - startedAtRef.current));
     videoRef.current?.pause();
     setPlaying(false);
-  }, []);
+  };
 
-  const resumeAll = useCallback(() => {
+  const resume = () => {
     setPlaying(true);
     const v = videoRef.current;
     if (v && v.currentTime > 0 && !v.ended) v.play().catch(() => {});
-    if (timerRemainingRef.current > 0) {
-      timerStartedAtRef.current = Date.now();
-      timerRef.current = setTimeout(runStep, timerRemainingRef.current);
-    } else {
-      runStep();
-    }
-  }, [runStep]);
-
-  const replayAll = useCallback(() => {
-    const v = videoRef.current;
-    if (v) {
-      try {
-        v.currentTime = 0.01;
-      } catch {}
-      v.pause();
-    }
-    startSequence();
-  }, [startSequence]);
-
-  const togglePlay = () => {
-    if (finished) {
-      replayAll();
-      return;
-    }
-    if (playing) pauseAll();
-    else resumeAll();
+    if (remainingRef.current > 0) {
+      startedAtRef.current = Date.now();
+      timerRef.current = setTimeout(runStep, remainingRef.current);
+    } else runStep();
   };
 
-  // Start ONCE when scrolled into view
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting) return;
-        io.disconnect();
-        if (startedOnceRef.current) return;
-        startedOnceRef.current = true;
-        if (reduce) {
-          setVisibleIdx(SCRIPT.map((_, i) => i));
-          setFinished(true);
-          triggerBloom();
-          return;
-        }
-        startSequence();
-      },
-      { threshold: 0.35 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [reduce, startSequence, triggerBloom]);
-
-  // Cleanup on unmount
-  useEffect(() => () => clearTimer(), []);
-
-  // Motion preference
-  useEffect(() => {
-    const m = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduce(m.matches);
-    const handler = () => setReduce(m.matches);
-    m.addEventListener?.("change", handler);
-    return () => m.removeEventListener?.("change", handler);
-  }, []);
-
-  // Prime video first frame
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted = true;
-    try {
-      v.currentTime = 0.01;
-    } catch {}
-  }, []);
-
-  // Timestamp-based bloom
-  useEffect(() => {
-    if (REACTION_TIMESTAMP == null) return;
-    const v = videoRef.current;
-    if (!v) return;
-    const onTime = () => {
-      if (v.currentTime >= (REACTION_TIMESTAMP as number)) {
-        triggerBloom();
-        v.removeEventListener("timeupdate", onTime);
+  const toggle = () => {
+    if (finished) {
+      const v = videoRef.current;
+      if (v) {
+        try {
+          v.currentTime = 0.01;
+        } catch {}
+        v.pause();
       }
-    };
-    v.addEventListener("timeupdate", onTime);
-    return () => v.removeEventListener("timeupdate", onTime);
-  }, [triggerBloom]);
+      start();
+      return;
+    }
+    if (playing) pause();
+    else if (visibleIdx.length === 0) {
+      soundArmedRef.current = true;
+      start();
+    } else resume();
+  };
+
+  useEffect(() => () => clearTimer(), []);
 
   const toggleMute = () => {
     const v = videoRef.current;
@@ -366,7 +244,6 @@ function DemoBlock({
     const next = !muted;
     v.muted = next;
     setMuted(next);
-    // Once the user unmutes, treat sound as armed so later autoplay triggers don't remute.
     if (!next) soundArmedRef.current = true;
     if (!next && v.currentTime > 0 && !v.ended) v.play().catch(() => {});
   };
@@ -374,328 +251,228 @@ function DemoBlock({
   const lastThemVisible = Math.max(-1, ...visibleIdx.filter((i) => SCRIPT[i].from === "them"));
 
   return (
-    <div ref={sectionRef} className="space-y-8">
-      <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-        {/* Video */}
-        <Reveal>
-          <div className="relative rounded-[2.5rem] overflow-hidden shadow-float bg-black aspect-[4/5]">
-            <video
-              ref={videoRef}
-              src={reactionVideo.url}
-              preload="metadata"
-              playsInline
-              muted
-              className="w-full h-full object-cover duotone"
-            />
-            <button
-              onClick={toggleMute}
-              aria-label={muted ? "Unmute video" : "Mute video"}
-              className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-black/55 backdrop-blur text-white flex items-center justify-center hover:bg-black/70 transition"
-            >
-              {muted ? (
-                <VolumeX className="w-4 h-4" strokeWidth={1.75} />
-              ) : (
-                <Volume2 className="w-4 h-4" strokeWidth={1.75} />
-              )}
-            </button>
-          </div>
-        </Reveal>
-
-        {/* Chat + floating caption */}
-        <Reveal delay={80}>
-          <div className="relative">
-            <div
-              className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-4 md:-top-6 z-10 transition-all duration-[550ms] ease-out ${
-                showCaption ? "opacity-100 -translate-y-1" : "opacity-0 translate-y-2"
-              }`}
-            >
-              <div className="rounded-full bg-card/90 backdrop-blur border border-border/60 shadow-soft px-5 py-2 text-sm font-medium">
-                It's heating now.
-              </div>
-            </div>
-
-            <div
-              className={`rounded-[2rem] shadow-float overflow-hidden border border-border/40 max-w-md mx-auto transition-[filter] duration-[900ms] ease-out ${
-                bloomedLocal ? "" : "duotone"
-              }`}
-              style={{ backgroundColor: "#ECE5DD" }}
-            >
-              {/* WhatsApp header */}
-              <div className="px-4 py-3 flex items-center gap-3" style={{ backgroundColor: "#075E54", color: "white" }}>
-                <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white font-semibold">
-                  G
-                </div>
-                <div className="min-w-0">
-                  <div className="font-semibold text-[15px] leading-tight">GeyserBrain</div>
-                  <div className="text-[12px] leading-tight text-white/80 h-[16px]">
-                    {typing ? "typing…" : "online"}
-                  </div>
-                </div>
-              </div>
-
-              {/* Chat body */}
-              <div
-                className="px-4 py-5 space-y-1.5 min-h-[440px]"
-                style={{
-                  backgroundColor: "#ECE5DD",
-                  backgroundImage: "radial-gradient(oklch(0 0 0 / 0.04) 1px, transparent 1px)",
-                  backgroundSize: "14px 14px",
-                }}
-              >
-                {visibleIdx.map((idx) => {
-                  const m = SCRIPT[idx];
-                  const isMe = m.from === "me";
-                  const read = isMe && idx < lastThemVisible;
-                  return (
-                    <div
-                      key={idx}
-                      className={`flex ${isMe ? "justify-end" : "justify-start"} animate-[fadeRise_.45s_ease-out_both]`}
-                    >
-                      <div
-                        className={`relative max-w-[78%] px-3 pt-2 pb-[6px] text-[14.5px] leading-snug shadow-[0_1px_0.5px_rgba(0,0,0,0.13)] ${
-                          isMe
-                            ? "rounded-2xl rounded-br-[4px] text-neutral-900"
-                            : "rounded-2xl rounded-bl-[4px] text-neutral-900"
-                        }`}
-                        style={{
-                          backgroundColor: isMe ? "#DCF8C6" : "#FFFFFF",
-                        }}
-                      >
-                        <span className="pr-14">{m.text}</span>
-                        <span className="absolute bottom-1 right-2 flex items-center gap-1 text-[10.5px] text-neutral-500 leading-none">
-                          <span>{TIMES[idx]}</span>
-                          {isMe && <DoubleCheck read={read} />}
-                        </span>
-                        {/* Tail */}
-                        <span
-                          aria-hidden
-                          className={`absolute bottom-0 w-2 h-2 ${isMe ? "-right-1" : "-left-1"}`}
-                          style={{
-                            backgroundColor: isMe ? "#DCF8C6" : "#FFFFFF",
-                            clipPath: isMe ? "polygon(0 0, 100% 100%, 0 100%)" : "polygon(100% 0, 100% 100%, 0 100%)",
-                          }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-                {typing && (
-                  <div className="flex justify-start">
-                    <div
-                      className="rounded-2xl rounded-bl-[4px] px-4 py-3 flex gap-1 shadow-[0_1px_0.5px_rgba(0,0,0,0.13)]"
-                      style={{ backgroundColor: "#FFFFFF" }}
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-[dot_1.2s_ease-in-out_infinite]" />
-                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-[dot_1.2s_ease-in-out_.15s_infinite]" />
-                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-[dot_1.2s_ease-in-out_.3s_infinite]" />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </Reveal>
+    <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-center">
+      <div className="relative rounded-3xl overflow-hidden shadow-soft bg-black aspect-[4/5] md:aspect-[4/5]">
+        <video
+          ref={videoRef}
+          src={reactionVideo.url}
+          preload="metadata"
+          playsInline
+          muted
+          className="w-full h-full object-cover"
+        />
+        <button
+          onClick={toggleMute}
+          aria-label={muted ? "Unmute" : "Mute"}
+          className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-black/55 backdrop-blur text-white flex items-center justify-center"
+        >
+          {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+        </button>
       </div>
 
-      {/* Shared play / pause / replay control */}
-      <div className="flex justify-center">
-        <button
-          onClick={togglePlay}
-          aria-label={finished ? "Replay demo" : playing ? "Pause demo" : "Play demo"}
-          className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card px-5 py-2.5 text-sm font-medium text-foreground shadow-soft hover:-translate-y-0.5 hover:shadow-float transition-all"
-        >
-          {finished ? (
-            <>
-              <RotateCcw className="w-4 h-4" strokeWidth={1.9} />
-              Replay
-            </>
-          ) : playing ? (
-            <>
-              <Pause className="w-4 h-4" strokeWidth={1.9} />
-              Pause
-            </>
-          ) : (
-            <>
-              <Play className="w-4 h-4" strokeWidth={1.9} />
-              Play
-            </>
-          )}
-        </button>
+      <div>
+        <div className="rounded-3xl overflow-hidden border border-border/40 shadow-soft max-w-sm mx-auto" style={{ backgroundColor: "#ECE5DD" }}>
+          <div className="px-4 py-3 flex items-center gap-3" style={{ backgroundColor: "#075E54", color: "white" }}>
+            <div className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center font-semibold">G</div>
+            <div>
+              <div className="text-sm font-semibold leading-tight">GeyserBrain</div>
+              <div className="text-[11px] text-white/80 h-[14px]">{typing ? "typing…" : "online"}</div>
+            </div>
+          </div>
+          <div
+            className="px-3 py-4 space-y-1.5 min-h-[300px]"
+            style={{
+              backgroundImage: "radial-gradient(oklch(0 0 0 / 0.04) 1px, transparent 1px)",
+              backgroundSize: "14px 14px",
+            }}
+          >
+            {visibleIdx.map((idx) => {
+              const m = SCRIPT[idx];
+              const isMe = m.from === "me";
+              const read = isMe && idx < lastThemVisible;
+              return (
+                <div key={idx} className={`flex ${isMe ? "justify-end" : "justify-start"} animate-[fadeRise_.4s_ease-out_both]`}>
+                  <div
+                    className="relative max-w-[80%] px-3 pt-1.5 pb-1 text-[13.5px] leading-snug shadow-[0_1px_0.5px_rgba(0,0,0,0.13)] rounded-2xl"
+                    style={{ backgroundColor: isMe ? "#DCF8C6" : "#FFFFFF", color: "#111b21" }}
+                  >
+                    <span className="pr-12">{m.text}</span>
+                    <span className="absolute bottom-1 right-2 flex items-center gap-1 text-[10px] text-neutral-500 leading-none">
+                      <span>{TIMES[idx]}</span>
+                      {isMe && <DoubleCheck read={read} />}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+            {typing && (
+              <div className="flex justify-start">
+                <div className="rounded-2xl px-3 py-2 flex gap-1 shadow-[0_1px_0.5px_rgba(0,0,0,0.13)]" style={{ backgroundColor: "#FFFFFF" }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-[dot_1.2s_ease-in-out_infinite]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-[dot_1.2s_ease-in-out_.15s_infinite]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-[dot_1.2s_ease-in-out_.3s_infinite]" />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={toggle}
+            className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card px-4 py-2 text-xs font-medium shadow-soft"
+          >
+            {finished ? (
+              <>
+                <RotateCcw className="w-3.5 h-3.5" /> Replay
+              </>
+            ) : playing ? (
+              <>
+                <Pause className="w-3.5 h-3.5" /> Pause
+              </>
+            ) : (
+              <>
+                <Play className="w-3.5 h-3.5" /> Play demo
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-/* ---------- Floating WhatsApp ---------- */
+/* ---------- Country selector ---------- */
+function CountrySelector({
+  country,
+  setCountry,
+}: {
+  country: CountryCode;
+  setCountry: (c: CountryCode) => void;
+}) {
+  return (
+    <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-2 py-1 text-xs">
+      <span className="pl-2 text-muted-foreground">Country</span>
+      <select
+        value={country}
+        onChange={(e) => setCountry(e.target.value as CountryCode)}
+        className="bg-transparent focus:outline-none pr-2 py-1"
+      >
+        {(Object.keys(COUNTRY_PRICING) as CountryCode[]).map((c) => (
+          <option key={c} value={c}>
+            {COUNTRY_PRICING[c].flag} {COUNTRY_PRICING[c].label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
 
-function FloatingWA() {
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setShow(window.scrollY > window.innerHeight * 0.9);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+/* ---------- Floating WhatsApp ---------- */
+function FloatingWA({ country, device }: { country: CountryCode; device: DeviceId | null }) {
   return (
     <a
       href={wa(WA_HELLO)}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() =>
+        track({
+          event_name: "whatsapp_clicked",
+          funnel_step: "floating",
+          selected_device: device,
+          country,
+        })
+      }
       aria-label="Message us on WhatsApp"
-      className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-float transition-all duration-500 motion-safe:animate-[breathe_3s_ease-in-out_infinite] ${
-        show ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"
-      }`}
+      className="fixed bottom-5 right-5 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-float text-white motion-safe:animate-[breathe_3s_ease-in-out_infinite]"
+      style={{ backgroundColor: "#25D366" }}
     >
-      <MessageCircle className="w-6 h-6" strokeWidth={1.75} />
+      <MessageCircle className="w-6 h-6" />
     </a>
   );
 }
 
-/* ---------- Green "See it work" reveal button ---------- */
-
-function SeeItWorkButton({ onArm, className = "" }: { onArm: () => void; className?: string }) {
-  const ref = useRef<HTMLButtonElement>(null);
-  const [bounced, setBounced] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting && !bounced) {
-          setBounced(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.6 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [bounced]);
-  return (
-    <button
-      ref={ref}
-      onClick={(e) => {
-        e.preventDefault();
-        onArm();
-        document.getElementById("demo")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }}
-      className={`relative inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-medium text-white transition-all duration-150 hover:-translate-y-0.5 motion-safe:animate-[glow_3s_ease-in-out_infinite] ${
-        bounced ? "motion-safe:animate-[softBounce_.9s_ease-out_1]" : ""
-      } ${className}`}
-      style={{ backgroundColor: "#25D366" }}
-    >
-      See it work
-    </button>
-  );
-}
-
-/* ---------- FAQ ---------- */
-
-type Faq = { q: string; a: string; action?: "waitlist" };
-
-const faqs: Faq[] = [
-  {
-    q: "What can GeyserBrain control right now?",
-    a: "Today we install smart controllers for geysers and smart plugs — so you can switch appliances on and off and set schedules from WhatsApp. Lights, gates and security devices are on the roadmap and available as custom quotes on request.",
-  },
-  {
-    q: "Is this available in my country?",
-    a: "We install directly in South Africa. Zimbabwe is in a small pilot. Zambia and other countries are on the waitlist — we'll match you with a partner installer where we can.",
-    action: "waitlist",
-  },
-  {
-    q: "How long does installation take?",
-    a: "A single device usually takes under two hours. A certified electrician handles it — you barely notice it happen.",
-  },
-  {
-    q: "Can I start with one device and add more later?",
-    a: "Yes. Most people start with a geyser or a couple of smart plugs, then add more when they're ready. Each device is a small add-on, not a new subscription.",
-  },
-  {
-    q: "Can I cancel anytime?",
-    a: "Yes. Month-to-month, no lock-in. Your devices keep working — you just lose the WhatsApp control and reports.",
-  },
-];
-
 /* ---------- Page ---------- */
+export const Route = createFileRoute("/")({
+  component: Landing,
+  head: () => ({
+    links: [{ rel: "preload", as: "image", href: heroImg, fetchpriority: "high" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }),
+      },
+    ],
+  }),
+});
 
 function Landing() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [bloomed, setBloomed] = useState(false);
-  const [chatActive, setChatActive] = useState(false);
-  const [chatMode, setChatMode] = useState<"qualify" | "waitlist">("qualify");
   const [menuOpen, setMenuOpen] = useState(false);
-  const soundArmedRef = useRef(false);
-  const pricing = useCurrency();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerDevice, setDrawerDevice] = useState<DeviceId | null>(null);
+  const { country, setCountry, ready } = useCountry();
+  const price = pricingFor(country);
 
-  const openQualifyChat = () => {
-    setChatMode("qualify");
-    setChatActive(true);
-    setTimeout(() => {
-      document.getElementById("qualify-chat")?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 60);
-  };
+  // First-touch capture + page_view
+  useEffect(() => {
+    ensureUtmCapture();
+    getSessionId();
+    track({ event_name: "page_view", funnel_step: "hero", country });
+  }, []);
 
-  const openWaitlistChat = () => {
-    setChatMode("waitlist");
-    setChatActive(true);
-    setTimeout(() => {
-      document.getElementById("qualify-chat")?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 60);
+  useEffect(() => {
+    if (ready) track({ event_name: "device_picker_viewed", funnel_step: "device", country });
+  }, [ready, country]);
+
+  const openDrawer = (device: DeviceId) => {
+    setDrawerDevice(device);
+    setDrawerOpen(true);
   };
 
   return (
-    <div className={`min-h-screen bg-background text-foreground overflow-x-hidden ${bloomed ? "bloomed" : ""}`}>
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <style>{`
-        @keyframes fadeRise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeRise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes dot { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-2px); } }
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
-        @keyframes glow {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.35), 0 10px 30px -12px rgba(37,211,102,0.5); }
-          50% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0), 0 14px 34px -12px rgba(37,211,102,0.65); }
-        }
-        @keyframes softBounce {
-          0% { transform: translateY(0); }
-          40% { transform: translateY(-6px); }
-          70% { transform: translateY(-2px); }
-          100% { transform: translateY(0); }
-        }
       `}</style>
 
       {/* Nav */}
       <header className="fixed top-3 md:top-4 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-5xl">
-        <div className="rounded-full bg-white/75 backdrop-blur-xl border border-white/80 shadow-soft pl-3 pr-3 md:pl-5 md:pr-5 py-2 md:py-3 flex items-center justify-between gap-3">
+        <div className="rounded-full bg-white/80 backdrop-blur-xl border border-white/80 shadow-soft pl-3 pr-3 md:pl-5 md:pr-5 py-2 md:py-3 flex items-center justify-between gap-3">
           <a href="#" className="flex items-center gap-2 font-medium min-w-0 text-neutral-900">
             <img src={logoAsset} alt="GeyserBrain" className="h-7 md:h-8 w-auto shrink-0" />
             <span className="hidden sm:inline truncate">GeyserBrain</span>
           </a>
-          <nav className="hidden md:flex items-center gap-8 text-sm text-neutral-700">
-            <a href="#benefits" className="hover:text-neutral-950 transition">
-              Benefits
-            </a>
-            <a href="#how" className="hover:text-neutral-950 transition">
-              How it works
-            </a>
-            <a href="#pricing" className="hover:text-neutral-950 transition">
-              Pricing
-            </a>
-            <a href="#faq" className="hover:text-neutral-950 transition">
-              FAQ
-            </a>
+          <nav className="hidden md:flex items-center gap-7 text-sm text-neutral-700">
+            <a href="#devices" className="hover:text-neutral-950">Devices</a>
+            <a href="#pricing" className="hover:text-neutral-950">Pricing</a>
+            <a href="#how" className="hover:text-neutral-950">How it works</a>
+            <a href="#faq" className="hover:text-neutral-950">FAQ</a>
           </nav>
           <div className="flex items-center gap-2 shrink-0">
+            <CountrySelector country={country} setCountry={setCountry} />
             <a
               href={wa(WA_HELLO)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-4 md:px-5 py-2 text-xs font-medium hover:opacity-90 transition"
+              onClick={() => track({ event_name: "whatsapp_clicked", funnel_step: "nav", country })}
+              className="hidden sm:inline-flex items-center rounded-full bg-primary text-primary-foreground px-4 py-2 text-xs font-medium"
             >
-              Message us
+              Talk to us
             </a>
             <button
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
-              className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-full border border-white/80 bg-white/75 backdrop-blur-xl text-neutral-900 hover:bg-white/90 transition"
+              className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-full border border-white/80 bg-white/80 text-neutral-900"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
             >
@@ -706,425 +483,323 @@ function Landing() {
         {menuOpen && (
           <div className="md:hidden mt-3 flex flex-col items-end gap-2">
             {[
-              { href: "#benefits", label: "Benefits" },
-              { href: "#how", label: "How it works" },
+              { href: "#devices", label: "Devices" },
               { href: "#pricing", label: "Pricing" },
+              { href: "#how", label: "How it works" },
               { href: "#faq", label: "FAQ" },
             ].map((l) => (
               <a
                 key={l.href}
                 href={l.href}
                 onClick={() => setMenuOpen(false)}
-                className="w-auto px-4 py-2 rounded-full text-xs font-semibold text-right text-neutral-900 bg-white/15 backdrop-blur-md border border-white/40 shadow-[0_4px_16px_rgba(0,0,0,0.12)] [text-shadow:0_1px_2px_rgba(255,255,255,0.6)] hover:bg-white/25 transition"
+                className="px-4 py-2 rounded-full text-xs font-semibold text-right text-neutral-900 bg-white/20 backdrop-blur-md border border-white/40 shadow-[0_4px_16px_rgba(0,0,0,0.12)] [text-shadow:0_1px_2px_rgba(255,255,255,0.6)]"
               >
                 {l.label}
               </a>
             ))}
           </div>
         )}
-
-
       </header>
 
       {/* 1. Hero */}
-      <section className="relative h-[92svh] min-h-[560px] w-full overflow-hidden">
+      <section className="relative h-[70svh] min-h-[480px] w-full overflow-hidden">
         <img
           src={heroImg}
-          alt="A calm, softly lit home interior"
+          alt="A calm, softly lit home"
           width={1920}
           height={1080}
           fetchPriority="high"
           decoding="async"
-          className="absolute inset-0 w-full h-full object-cover duotone"
+          className="absolute inset-0 w-full h-full object-cover"
         />
-
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent md:from-black/60 md:via-black/25" />
-        <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-10 flex items-end md:items-center">
-          <div className="pb-20 md:pb-0 max-w-2xl text-white space-y-5 md:space-y-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/10" />
+        <div className="relative z-10 h-full max-w-6xl mx-auto px-6 flex items-end md:items-center pb-12 md:pb-0">
+          <div className="max-w-2xl text-white space-y-4 md:space-y-5">
             <div className="inline-flex items-center rounded-full bg-white/15 backdrop-blur border border-white/30 px-3 py-1 text-[11px] tracking-wide uppercase">
               Affordable WhatsApp smart home
             </div>
-            <h1 className="text-[2.5rem] leading-[1.05] sm:text-6xl md:text-7xl tracking-tight">
+            <h1 className="text-[2.25rem] leading-[1.05] sm:text-5xl md:text-6xl tracking-tight">
               Control your home
               <br />
               <span className="italic text-white/85">from WhatsApp.</span>
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-white/85 max-w-lg leading-relaxed">
-              Lights, geysers, plugs and more — start with one device today and add the rest when you're ready. No new app to learn.
+            <p className="text-sm sm:text-base md:text-lg text-white/85 max-w-lg leading-relaxed">
+              Lights, geysers, plugs and more — start with one device today and add the rest when you're ready.
             </p>
-            <p className="text-xs sm:text-sm text-white/70 max-w-lg">
-              Installation arranged where available. Available in South Africa · Pilot in Zimbabwe · Waitlist in Zambia.
-            </p>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
+            <p className="text-[11px] sm:text-xs text-white/70 max-w-lg">{AVAILABILITY_LINE}</p>
+            <div className="flex flex-col sm:flex-row gap-3 pt-1">
               <a
                 href="#devices"
-                className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
+                onClick={() => track({ event_name: "cta_clicked", funnel_step: "hero", country, metadata: { cta: "choose_a_device" } })}
+                className="inline-flex items-center justify-center rounded-full bg-white text-black px-6 py-3 text-sm font-medium shadow-soft"
               >
-                Choose what I want to control
+                Choose a device
               </a>
-              <SeeItWorkButton
-                onArm={() => {
-                  soundArmedRef.current = true;
-                }}
-              />
+              <a
+                href={wa(WA_HELLO)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => track({ event_name: "whatsapp_clicked", funnel_step: "hero", country })}
+                className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium text-white"
+                style={{ backgroundColor: "#25D366" }}
+              >
+                Talk to us
+              </a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 1b. Device picker */}
-      <section id="devices" className="py-20 md:py-28 px-6 scroll-mt-24">
+      {/* 2. Device picker */}
+      <section id="devices" className="py-12 md:py-20 px-6 scroll-mt-20">
         <div className="max-w-6xl mx-auto">
-          <Reveal className="max-w-2xl mb-10 md:mb-14">
-            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">Step one</div>
-            <h2 className="text-3xl md:text-5xl leading-tight">What would you like to control?</h2>
-            <p className="mt-4 text-muted-foreground text-base md:text-lg">
-              Pick a starting device. We'll check what's possible in your home and install it for you.
+          <Reveal className="max-w-2xl mb-6 md:mb-10">
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">Step one</div>
+            <h2 className="text-2xl md:text-4xl leading-tight">What would you like to control?</h2>
+            <p className="mt-3 text-sm md:text-base text-muted-foreground">
+              Tap a device. We'll capture your details and send your price.
             </p>
           </Reveal>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
-            {[
-              { icon: "💡", label: "Lights", status: "Coming soon" as const },
-              { icon: "🚿", label: "Geyser", status: "Available now" as const },
-              { icon: "🔌", label: "Plugs & appliances", status: "Available now" as const },
-              { icon: "🚪", label: "Gates & security", status: "Custom quote" as const },
-            ].map((d) => {
+            {DEVICES.map((d) => {
               const tone =
                 d.status === "Available now"
                   ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                  : d.status === "Coming soon"
-                    ? "bg-neutral-100 text-neutral-700 border-neutral-200"
-                    : "bg-amber-50 text-amber-800 border-amber-200";
+                  : "bg-amber-50 text-amber-800 border-amber-200";
               return (
                 <button
-                  key={d.label}
+                  key={d.id}
                   type="button"
-                  onClick={openQualifyChat}
-                  className="group text-left rounded-3xl border border-border/60 bg-card p-5 md:p-6 shadow-soft hover:-translate-y-0.5 hover:shadow-float transition-all"
+                  onClick={() => openDrawer(d.id as DeviceId)}
+                  className="group text-left rounded-2xl border border-border/60 bg-card p-4 md:p-5 shadow-soft hover:-translate-y-0.5 hover:shadow-float transition-all"
                 >
-                  <div className="text-3xl md:text-4xl mb-3">{d.icon}</div>
-                  <div className="text-base md:text-lg font-medium">{d.label}</div>
-                  <div className={`mt-3 inline-flex items-center rounded-full border px-2 py-0.5 text-[10.5px] font-medium ${tone}`}>
+                  <div className="text-2xl md:text-3xl mb-2">{d.icon}</div>
+                  <div className="text-sm md:text-base font-medium">{d.label}</div>
+                  <div className={`mt-2 inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${tone}`}>
                     {d.status}
                   </div>
                 </button>
               );
             })}
           </div>
-          <p className="mt-6 text-xs text-muted-foreground">
-            Not sure what you need? Tap any tile — a real person will help you pick.
-          </p>
-        </div>
-      </section>
 
-      {/* 1c. Start small */}
-      <section className="py-20 md:py-28 px-6 bg-secondary/40">
-        <div className="max-w-6xl mx-auto">
-          <Reveal className="max-w-2xl mb-10 md:mb-14">
-            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">Affordable & expandable</div>
-            <h2 className="text-3xl md:text-5xl leading-tight">Start small. Add more later.</h2>
-            <p className="mt-4 text-muted-foreground text-base md:text-lg">
-              One device is enough to begin. Every add-on plugs into the same WhatsApp chat — no new app, no new subscription per device.
-            </p>
-          </Reveal>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+          {/* Merged benefits row */}
+          <div className="mt-8 grid grid-cols-3 gap-3 md:gap-6 text-center">
             {[
-              {
-                title: "Smart geyser controller",
-                desc: "Switch on and off, set schedules, see weekly electricity usage.",
-                status: "Available now" as const,
-              },
-              {
-                title: "Smart plugs",
-                desc: "Control any appliance — fridge, kettle, borehole pump, pool pump.",
-                status: "Available now" as const,
-              },
-              {
-                title: "Smart lights",
-                desc: "Turn lights on and off or dim from WhatsApp. Rooms or zones.",
-                status: "Coming soon" as const,
-              },
-              {
-                title: "Gates & security",
-                desc: "Open your gate or garage from WhatsApp. Fitted per home.",
-                status: "Custom quote" as const,
-              },
-            ].map((p) => {
-              const tone =
-                p.status === "Available now"
-                  ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                  : p.status === "Coming soon"
-                    ? "bg-neutral-100 text-neutral-700 border-neutral-200"
-                    : "bg-amber-50 text-amber-800 border-amber-200";
-              return (
-                <div
-                  key={p.title}
-                  className="rounded-3xl border border-border/60 bg-card p-5 md:p-6 shadow-soft flex flex-col"
-                >
-                  <div className={`self-start inline-flex items-center rounded-full border px-2 py-0.5 text-[10.5px] font-medium ${tone}`}>
-                    {p.status}
-                  </div>
-                  <h3 className="mt-4 text-lg md:text-xl font-medium">{p.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed flex-1">{p.desc}</p>
-                </div>
-              );
-            })}
-          </div>
-          <div className="mt-8 rounded-2xl border border-border/60 bg-card p-4 md:p-5 text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">Where we install:</span>{" "}
-            <span className="inline-flex flex-wrap gap-x-4 gap-y-1">
-              <span>🇿🇦 South Africa — Available</span>
-              <span>🇿🇼 Zimbabwe — Pilot</span>
-              <span>🇿🇲 Zambia — Waitlist</span>
-              <span>🌍 Other — Check availability</span>
-            </span>
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* 2. Demo */}
-      <section id="demo" className="py-24 md:py-32 px-6">
-        <div className="max-w-6xl mx-auto space-y-14">
-          <Reveal className="max-w-2xl">
-            <h2 className="text-4xl md:text-5xl leading-tight">A conversation, not a control panel.</h2>
-          </Reveal>
-          <DemoBlock onBloom={() => setBloomed(true)} soundArmedRef={soundArmedRef} />
-        </div>
-      </section>
-
-      {/* Qualify chat drop-in */}
-      {chatActive && (
-        <section id="qualifies" className="scroll-mt-24 px-6 pb-12">
-          <div id="qualify-chat" className="max-w-xl mx-auto scroll-mt-24">
-            <QualifyChat active={chatActive} mode={chatMode} />
-          </div>
-        </section>
-      )}
-
-      {/* 3. Benefits */}
-      <section id="benefits" className="py-24 md:py-32 px-6 bg-secondary/40">
-        <div className="max-w-5xl mx-auto space-y-20 md:space-y-28">
-          {[
-            {
-              n: "01",
-              title: "Ask, and it's done.",
-              desc: "Switch it on, set a time, check if it's running — in your own words.",
-            },
-            {
-              n: "02",
-              title: "See what you're spending.",
-              desc: "A quiet weekly electricity report shows up in the chat. No app to open.",
-            },
-            {
-              n: "03",
-              title: "The whole home can use it.",
-              desc: "Add anyone in your household. No logins, no lost passwords.",
-            },
-          ].map((b, i) => (
-            <Reveal key={b.n} delay={i * 80}>
-              <div className="grid md:grid-cols-[auto_1fr] gap-6 md:gap-16 items-baseline">
-                <div className="text-sm text-muted-foreground tracking-widest">{b.n}</div>
-                <div className="space-y-3">
-                  <h3 className="text-3xl md:text-5xl leading-tight">{b.title}</h3>
-                  <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">{b.desc}</p>
-                </div>
+              { Icon: MessagesSquare, label: "Control naturally" },
+              { Icon: Clock, label: "Set schedules" },
+              { Icon: Gauge, label: "See usage" },
+            ].map(({ Icon, label }) => (
+              <div key={label} className="flex flex-col items-center gap-2">
+                <Icon className="w-5 h-5 text-muted-foreground" />
+                <div className="text-xs md:text-sm text-muted-foreground">{label}</div>
               </div>
-            </Reveal>
-          ))}
-          <Reveal delay={240}>
-            <p className="text-sm text-muted-foreground italic max-w-xl">
-              Is this for you? If you have Wi-Fi and a device you want to control, yes.
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* 4. How it works */}
-      <section id="how" className="py-24 md:py-32 px-6">
-        <div className="max-w-6xl mx-auto">
-          <Reveal className="text-center mb-16">
-            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">How it works</div>
-            <h2 className="text-4xl md:text-5xl">Three quiet steps.</h2>
-          </Reveal>
-          <div className="relative grid md:grid-cols-3 gap-12 md:gap-8">
-            <div className="hidden md:block absolute top-8 left-[16%] right-[16%] h-px bg-border" />
-            {[
-              { n: "01", title: "We check your home" },
-              { n: "02", title: "An electrician fits the controller" },
-              { n: "03", title: "You start chatting on WhatsApp" },
-            ].map((s, i) => (
-              <Reveal key={s.n} delay={i * 100}>
-                <div className="relative text-center md:text-left">
-                  <div className="relative z-10 w-16 h-16 mx-auto md:mx-0 rounded-full bg-background border border-border flex items-center justify-center text-sm tracking-widest text-muted-foreground mb-6">
-                    {s.n}
-                  </div>
-                  <h3 className="text-2xl leading-snug">{s.title}</h3>
-                </div>
-              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 5. Pricing */}
-      <section id="pricing" className="py-24 md:py-32 px-6 bg-primary text-primary-foreground">
-        <div className="max-w-3xl mx-auto text-center space-y-10">
-          <Reveal>
-            <div className="text-xs uppercase tracking-[0.3em] text-primary-foreground/80">First 10 homes only</div>
+      {/* 3. Pricing (merged with "Choose your first smart device") */}
+      <section id="pricing" className="py-12 md:py-20 px-6 bg-secondary/40">
+        <div className="max-w-4xl mx-auto">
+          <Reveal className="max-w-2xl mb-6 md:mb-10">
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">Pricing</div>
+            <h2 className="text-2xl md:text-4xl leading-tight">Choose your first smart device.</h2>
+            <p className="mt-3 text-sm md:text-base text-muted-foreground">
+              One flat price for hardware and installation. Pay once, or over four months.
+            </p>
           </Reveal>
-          <Reveal delay={80}>
-            <div>
-              <div className="text-6xl md:text-8xl tracking-tight leading-none">{pricing.install}</div>
-              <div className="text-primary-foreground/85 mt-3">
-                installed{pricing.currency === "ZAR" ? " (incl. VAT)" : ""}
-              </div>
-            </div>
-          </Reveal>
-          <Reveal delay={140}>
-            <div className="max-w-md mx-auto pt-6 border-t border-primary-foreground/25">
-              <ul className="text-left space-y-3 text-sm text-primary-foreground">
-                {[
-                  "Smart geyser controller included",
-                  "Certified electrician installation",
-                  "GeyserBrain setup on WhatsApp",
-                  "First 3 months included",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <Check className="w-4 h-4 mt-0.5 flex-shrink-0" strokeWidth={2.5} />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="text-xs text-primary-foreground/85 mt-6">
-                Then {pricing.monthly}/month. Cancel anytime.
-                {pricing.approx ? " Prices outside South Africa are estimates." : ""}
-              </p>
-              <p className="text-xs text-primary-foreground/80 mt-3">
-                You'll need Wi-Fi at home. Installation arranged where available.
-              </p>
 
+          <div className="rounded-3xl border border-border/60 bg-card p-5 md:p-8 shadow-soft space-y-6">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <div className="text-xs text-muted-foreground">
+                  {price.flag} {price.label}
+                </div>
+                <div className="text-sm text-muted-foreground">Per device installed</div>
+              </div>
+              <CountrySelector country={country} setCountry={setCountry} />
             </div>
+
+            {price.quoteOnly ? (
+              <div className="rounded-2xl border border-border/60 p-6 text-center">
+                <div className="text-2xl md:text-3xl font-medium">Get a local quote</div>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  We'll match you with a partner installer where possible.
+                </p>
+                <a
+                  href={wa(WA_HELLO)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => track({ event_name: "whatsapp_clicked", funnel_step: "pricing_quote", country })}
+                  className="mt-4 inline-flex items-center rounded-full bg-primary text-primary-foreground px-6 py-3 text-sm font-medium"
+                >
+                  Request a quote
+                </a>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="rounded-2xl border border-border/60 p-5">
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground">Pay once</div>
+                  <div className="mt-2 text-3xl md:text-4xl font-medium">{price.upfront}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">Hardware + installation</div>
+                </div>
+                <div className="rounded-2xl border border-border/60 p-5 bg-primary text-primary-foreground">
+                  <div className="text-xs uppercase tracking-widest opacity-80">Pay over 4 months</div>
+                  <div className="mt-2 text-3xl md:text-4xl font-medium">
+                    {price.instalment}
+                    <span className="text-sm font-normal opacity-80">/mo</span>
+                  </div>
+                  <div className="mt-1 text-xs opacity-80">
+                    {price.instalments} monthly payments · hardware + installation only
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="grid sm:grid-cols-3 gap-3">
+              {DEVICES.filter((d) => d.status === "Available now").map((d) => (
+                <button
+                  key={d.id}
+                  onClick={() => openDrawer(d.id as DeviceId)}
+                  className="rounded-2xl border border-border/60 bg-background p-4 text-left hover:-translate-y-0.5 hover:shadow-float transition-all"
+                >
+                  <div className="text-xl">{d.icon}</div>
+                  <div className="mt-2 text-sm font-medium">Start with {d.label}</div>
+                  <div className="mt-2 text-xs text-muted-foreground">Get my price →</div>
+                </button>
+              ))}
+            </div>
+
+            <p className="text-[11px] text-muted-foreground">
+              {AVAILABILITY_LINE} Gates & security are fitted after a custom assessment of your existing equipment.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Compact demo */}
+      <section id="demo" className="py-12 md:py-20 px-6">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <Reveal className="max-w-2xl">
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">See it work</div>
+            <h2 className="text-2xl md:text-4xl leading-tight">A conversation, not a control panel.</h2>
           </Reveal>
-          <Reveal delay={200}>
-            <button
-              type="button"
-              onClick={openQualifyChat}
-              className="inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-medium bg-white text-black shadow-float hover:-translate-y-0.5 transition-all"
-            >
-              Check if my home qualifies
-            </button>
+          <CompactDemo />
+        </div>
+      </section>
+
+      {/* 5. Three-step install */}
+      <section id="how" className="py-12 md:py-20 px-6 bg-secondary/40">
+        <div className="max-w-5xl mx-auto">
+          <Reveal className="text-center mb-8 md:mb-12">
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">How it works</div>
+            <h2 className="text-2xl md:text-4xl">Three quiet steps.</h2>
           </Reveal>
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+            {[
+              { n: "01", title: "You pick a device" },
+              { n: "02", title: "An electrician fits it" },
+              { n: "03", title: "You control it on WhatsApp" },
+            ].map((s) => (
+              <div key={s.n} className="text-center md:text-left">
+                <div className="w-12 h-12 mx-auto md:mx-0 rounded-full bg-background border border-border flex items-center justify-center text-xs tracking-widest text-muted-foreground mb-3">
+                  {s.n}
+                </div>
+                <h3 className="text-lg md:text-xl leading-snug">{s.title}</h3>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* 6. FAQ */}
-      <section id="faq" className="py-24 md:py-32 px-6">
+      <section id="faq" className="py-12 md:py-20 px-6">
         <div className="max-w-3xl mx-auto">
-          <Reveal className="text-center mb-14">
-            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">FAQ</div>
-            <h2 className="text-4xl md:text-5xl">Quiet answers.</h2>
+          <Reveal className="text-center mb-8">
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">FAQ</div>
+            <h2 className="text-2xl md:text-4xl">Quiet answers.</h2>
           </Reveal>
           <div className="space-y-3">
             {faqs.map((f, i) => {
               const open = openFaq === i;
               return (
-                <div
-                  key={i}
-                  className={`rounded-3xl border border-border/60 bg-card transition-all duration-[350ms] ${
-                    open ? "shadow-soft" : ""
-                  }`}
-                >
+                <div key={i} className={`rounded-2xl border border-border/60 bg-card ${open ? "shadow-soft" : ""}`}>
                   <button
                     onClick={() => setOpenFaq(open ? null : i)}
-                    className="w-full flex items-center justify-between text-left px-8 py-6"
+                    className="w-full flex items-center justify-between text-left px-5 py-4"
                     aria-expanded={open}
                   >
-                    <span className="text-lg font-medium pr-6">{f.q}</span>
-                    <ChevronDown
-                      className={`w-5 h-5 flex-shrink-0 transition-transform duration-[350ms] ${
-                        open ? "rotate-180" : ""
-                      }`}
-                    />
+                    <span className="text-sm md:text-base font-medium pr-4">{f.q}</span>
+                    <ChevronDown className={`w-5 h-5 flex-shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
                   </button>
-                  <div
-                    className={`grid transition-all duration-[550ms] ease-out ${
-                      open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                    }`}
-                  >
+                  <div className={`grid transition-all duration-300 ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
                     <div className="overflow-hidden">
-                      <div className="px-8 pb-6 text-muted-foreground leading-relaxed space-y-3">
-                        <p>{f.a}</p>
-                        {f.action === "waitlist" && (
-                          <button
-                            type="button"
-                            onClick={openWaitlistChat}
-                            className="text-sm text-foreground underline hover:opacity-70 transition"
-                          >
-                            Join the waitlist →
-                          </button>
-                        )}
-                      </div>
+                      <div className="px-5 pb-4 text-sm text-muted-foreground leading-relaxed">{f.a}</div>
                     </div>
                   </div>
                 </div>
               );
             })}
           </div>
-        </div>
-      </section>
 
-      {/* 7. Final */}
-      <section className="relative h-[85vh] min-h-[520px] w-full overflow-hidden">
-        <img
-          src={homeImg}
-          alt="A modern home in soft light"
-          loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover duotone"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/20" />
-        <div className="relative z-10 h-full flex items-center justify-center px-6">
-          <div className="text-center text-white space-y-6 md:space-y-8 max-w-2xl">
-            <h2 className="text-4xl sm:text-5xl md:text-7xl tracking-tight leading-[1.05]">
-              Switch off the work.
-              <br />
-              <span className="italic text-white/85">Switch on soft life.</span>
-            </h2>
-            <div className="pt-2 flex justify-center">
-              <button
-                type="button"
-                onClick={openQualifyChat}
-                className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
-              >
-                Check if my home qualifies
-              </button>
-            </div>
+          {/* Small AI Q&A affordance */}
+          <div className="mt-8">
+            <div className="text-xs text-muted-foreground mb-2">Still have a question?</div>
+            <QualifyChat device={null} country={country} />
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border/60">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
+      {/* 7. Compact final CTA */}
+      <section className="py-12 md:py-16 px-6 bg-primary text-primary-foreground">
+        <div className="max-w-3xl mx-auto text-center space-y-5">
+          <h2 className="text-2xl md:text-4xl leading-tight">Ready to start?</h2>
+          <p className="text-sm md:text-base opacity-85">
+            Pick a device and we'll send your price and installation details.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+              href="#devices"
+              className="inline-flex items-center justify-center rounded-full bg-white text-black px-6 py-3 text-sm font-medium"
+            >
+              Get my price
+            </a>
+            <a
+              href={wa(WA_HELLO)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => track({ event_name: "whatsapp_clicked", funnel_step: "final", country })}
+              className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium text-white"
+              style={{ backgroundColor: "#25D366" }}
+            >
+              Talk to us
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <footer className="py-8 px-6 border-t border-border/60">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
-            <img src={logoAsset} alt="GeyserBrain" className="h-7 w-auto" />
+            <img src={logoAsset} alt="GeyserBrain" className="h-6 w-auto" />
             <span className="text-foreground font-medium">GeyserBrain</span>
           </div>
           <div className="flex items-center gap-6">
-            <a href="/privacy" className="hover:text-foreground transition">
-              Privacy Policy
-            </a>
-            <a href="/terms" className="hover:text-foreground transition">
-              Terms of Service
-            </a>
+            <a href="/privacy" className="hover:text-foreground">Privacy</a>
+            <a href="/terms" className="hover:text-foreground">Terms</a>
           </div>
-          <p>© {new Date().getFullYear()} GeyserBrain. Smart home. Soft life.</p>
+          <p>© {new Date().getFullYear()} GeyserBrain</p>
         </div>
       </footer>
 
-      <FloatingWA />
+      <FloatingWA country={country} device={drawerDevice} />
+      <LeadDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        device={drawerDevice}
+        country={country}
+      />
     </div>
   );
 }
-
