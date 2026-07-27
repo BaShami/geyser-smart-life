@@ -421,11 +421,27 @@ function Landing() {
   const { country, setCountry, ready } = useCountry();
   const price = pricingFor(country);
 
-  // First-touch capture + page_view
+  // First-touch capture + page_view + restore drawer if a session was in progress
   useEffect(() => {
     ensureUtmCapture();
     getSessionId();
     track({ event_name: "page_view", funnel_step: "hero", country });
+    try {
+      const raw = localStorage.getItem(DRAWER_STATE_KEY);
+      if (raw) {
+        const s = JSON.parse(raw) as { device: DeviceId | null; step?: string };
+        if (s?.device && s.step && s.step !== "done") {
+          setDrawerDevice(s.device);
+          setDrawerOpen(true);
+          track({
+            event_name: "drawer_restored_on_load",
+            funnel_step: s.step,
+            selected_device: s.device,
+            country,
+          });
+        }
+      }
+    } catch {}
   }, []);
 
   useEffect(() => {
