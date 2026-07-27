@@ -536,17 +536,20 @@ function Landing() {
         <div className="relative z-10 h-full max-w-6xl mx-auto px-6 flex items-end md:items-center pb-12 md:pb-0">
           <div className="max-w-2xl text-white space-y-4 md:space-y-5">
             <div className="inline-flex items-center rounded-full bg-white/15 backdrop-blur border border-white/30 px-3 py-1 text-[11px] tracking-wide uppercase">
-              Affordable WhatsApp smart home
+              A conversation, not a control panel
             </div>
-            <h1 className="text-[2.25rem] leading-[1.05] sm:text-5xl md:text-6xl tracking-tight">
-              Control your home
+            <h1 className="text-[2rem] leading-[1.08] sm:text-5xl md:text-6xl tracking-tight">
+              Talk to your home
               <br />
-              <span className="italic text-white/85">from WhatsApp.</span>
+              <span className="italic text-white/85">on WhatsApp.</span>
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-white/85 max-w-lg leading-relaxed">
-              Lights, geysers, plugs and more — start with one device today and add the rest when you're ready.
+            <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl leading-relaxed">
+              Lights, geyser, plugs and more — start with one device today. An electrician installs it. You control everything by simple chat.
             </p>
-            <p className="text-[11px] sm:text-xs text-white/70 max-w-lg">{AVAILABILITY_LINE}</p>
+            <p className="text-xs sm:text-sm text-white/75 max-w-xl leading-relaxed">
+              Turn things on and off, set schedules, and see usage — all from the WhatsApp you already use every day. No new app to learn.
+            </p>
+            <p className="text-[11px] sm:text-xs text-white/60 max-w-xl">{AVAILABILITY_LINE}</p>
             <div className="flex flex-col sm:flex-row gap-3 pt-1">
               <a
                 href="#devices"
@@ -577,7 +580,7 @@ function Landing() {
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">Step one</div>
             <h2 className="text-2xl md:text-4xl leading-tight">What would you like to control?</h2>
             <p className="mt-3 text-sm md:text-base text-muted-foreground">
-              Tap a device. We'll capture your details and send your price.
+              Tap a device — we'll send you the exact price and availability in your area.
             </p>
           </Reveal>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
@@ -624,10 +627,13 @@ function Landing() {
         <div className="max-w-4xl mx-auto">
           <Reveal className="max-w-2xl mb-6 md:mb-10">
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">Pricing</div>
-            <h2 className="text-2xl md:text-4xl leading-tight">Choose your first smart device.</h2>
+            <h2 className="text-2xl md:text-4xl leading-tight">One clear price per device.</h2>
             <p className="mt-3 text-sm md:text-base text-muted-foreground">
-              One flat price for hardware and installation. Pay once, or over four months.
+              Hardware and professional installation, together in one price. Pay it once, or split it over four months.
             </p>
+            <div className="mt-3 inline-flex items-center rounded-full border border-border/60 bg-background px-3 py-1 text-[11px] font-medium text-muted-foreground">
+              One-time cost · not a subscription
+            </div>
           </Reveal>
 
           <div className="rounded-3xl border border-border/60 bg-card p-5 md:p-8 shadow-soft space-y-6">
