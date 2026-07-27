@@ -14,6 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          country: string | null
+          created_at: string
+          event_name: string
+          funnel_step: string | null
+          id: string
+          lead_id: string | null
+          metadata: Json | null
+          referrer: string | null
+          selected_device: string | null
+          session_id: string
+          utm: Json | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          event_name: string
+          funnel_step?: string | null
+          id?: string
+          lead_id?: string | null
+          metadata?: Json | null
+          referrer?: string | null
+          selected_device?: string | null
+          session_id: string
+          utm?: Json | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          event_name?: string
+          funnel_step?: string | null
+          id?: string
+          lead_id?: string | null
+          metadata?: Json | null
+          referrer?: string | null
+          selected_device?: string | null
+          session_id?: string
+          utm?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          city: string | null
+          country: string | null
+          current_step: string | null
+          device_interests: string[]
+          email: string | null
+          first_seen_at: string
+          first_utm: Json | null
+          has_wifi: boolean | null
+          id: string
+          last_completed_step: string | null
+          last_seen_at: string
+          latest_utm: Json | null
+          lead_status: string
+          name: string | null
+          notified_at: string | null
+          owns_or_rents: string | null
+          phone: string | null
+          referrer: string | null
+          session_id: string
+          transcript: Json
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          current_step?: string | null
+          device_interests?: string[]
+          email?: string | null
+          first_seen_at?: string
+          first_utm?: Json | null
+          has_wifi?: boolean | null
+          id?: string
+          last_completed_step?: string | null
+          last_seen_at?: string
+          latest_utm?: Json | null
+          lead_status?: string
+          name?: string | null
+          notified_at?: string | null
+          owns_or_rents?: string | null
+          phone?: string | null
+          referrer?: string | null
+          session_id: string
+          transcript?: Json
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          current_step?: string | null
+          device_interests?: string[]
+          email?: string | null
+          first_seen_at?: string
+          first_utm?: Json | null
+          has_wifi?: boolean | null
+          id?: string
+          last_completed_step?: string | null
+          last_seen_at?: string
+          latest_utm?: Json | null
+          lead_status?: string
+          name?: string | null
+          notified_at?: string | null
+          owns_or_rents?: string | null
+          phone?: string | null
+          referrer?: string | null
+          session_id?: string
+          transcript?: Json
+        }
+        Relationships: []
+      }
       qualify_leads: {
         Row: {
           city: string | null
