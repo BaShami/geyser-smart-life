@@ -533,7 +533,7 @@ function Landing() {
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/10" />
-        <div className="relative z-10 h-full max-w-6xl mx-auto px-6 flex items-end md:items-center pb-12 md:pb-0">
+        <div className="relative z-10 h-full max-w-6xl mx-auto px-6 flex items-end md:items-center pt-20 md:pt-0 pb-10 md:pb-0">
           <div className="max-w-2xl text-white space-y-4 md:space-y-5">
             <div className="inline-flex items-center rounded-full bg-white/15 backdrop-blur border border-white/30 px-3 py-1 text-[11px] tracking-wide uppercase">
               A conversation, not a control panel
