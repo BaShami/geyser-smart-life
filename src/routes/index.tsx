@@ -538,7 +538,7 @@ function FloatingWA() {
   }, []);
   return (
     <a
-      href={wa("GEYSER")}
+      href={wa(WA_HELLO)}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Message us on WhatsApp"
@@ -595,24 +595,25 @@ type Faq = { q: string; a: string; action?: "waitlist" };
 
 const faqs: Faq[] = [
   {
-    q: "How long does installation take?",
-    a: "Usually under two hours. A certified electrician handles it — you barely notice it happen.",
+    q: "What can GeyserBrain control right now?",
+    a: "Today we install smart controllers for geysers and smart plugs — so you can switch appliances on and off and set schedules from WhatsApp. Lights, gates and security devices are on the roadmap and available as custom quotes on request.",
   },
   {
-    q: "What if my home doesn't qualify?",
-    a: "You get a full refund. No questions, no forms.",
+    q: "Is this available in my country?",
+    a: "We install directly in South Africa. Zimbabwe is in a small pilot. Zambia and other countries are on the waitlist — we'll match you with a partner installer where we can.",
+    action: "waitlist",
+  },
+  {
+    q: "How long does installation take?",
+    a: "A single device usually takes under two hours. A certified electrician handles it — you barely notice it happen.",
+  },
+  {
+    q: "Can I start with one device and add more later?",
+    a: "Yes. Most people start with a geyser or a couple of smart plugs, then add more when they're ready. Each device is a small add-on, not a new subscription.",
   },
   {
     q: "Can I cancel anytime?",
-    a: "Yes. Month-to-month, no lock-in.",
-  },
-  {
-    q: "Is my data private?",
-    a: "Yes. Only you and the people you invite can control your geyser. We never share your usage.",
-  },
-  {
-    q: "What if I rent my home?",
-    a: "You'll need your landlord's OK — the install touches your distribution board.",
+    a: "Yes. Month-to-month, no lock-in. Your devices keep working — you just lose the WhatsApp control and reports.",
   },
 ];
 
@@ -684,7 +685,7 @@ function Landing() {
           </nav>
           <div className="flex items-center gap-2 shrink-0">
             <a
-              href={wa("GEYSER")}
+              href={wa(WA_HELLO)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-4 md:px-5 py-2 text-xs font-medium hover:opacity-90 transition"
@@ -797,7 +798,7 @@ function Landing() {
             {
               n: "02",
               title: "See what you're spending.",
-              desc: "A quiet weekly rand report shows up in the chat. No app to open.",
+              desc: "A quiet weekly electricity report shows up in the chat. No app to open.",
             },
             {
               n: "03",
@@ -817,7 +818,7 @@ function Landing() {
           ))}
           <Reveal delay={240}>
             <p className="text-sm text-muted-foreground italic max-w-xl">
-              Is this for you? If you have a geyser and Wi-Fi, yes.
+              Is this for you? If you have Wi-Fi and a device you want to control, yes.
             </p>
           </Reveal>
         </div>
@@ -884,7 +885,7 @@ function Landing() {
                 {pricing.approx ? " Prices outside South Africa are estimates." : ""}
               </p>
               <p className="text-xs text-primary-foreground/80 mt-3">
-                You'll need a geyser and Wi-Fi at home.
+                You'll need Wi-Fi at home. Installation arranged where available.
               </p>
 
             </div>
