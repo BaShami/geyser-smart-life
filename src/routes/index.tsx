@@ -727,7 +727,7 @@ function Landing() {
       </header>
 
       {/* 1. Hero */}
-      <section className="relative h-[100svh] min-h-[560px] w-full overflow-hidden">
+      <section className="relative h-[92svh] min-h-[560px] w-full overflow-hidden">
         <img
           src={heroImg}
           alt="A calm, softly lit home interior"
@@ -741,22 +741,27 @@ function Landing() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent md:from-black/60 md:via-black/25" />
         <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-10 flex items-end md:items-center">
           <div className="pb-20 md:pb-0 max-w-2xl text-white space-y-5 md:space-y-6">
-            <h1 className="text-[2.75rem] leading-[1] sm:text-6xl md:text-7xl tracking-tight">
-              Smart home.
+            <div className="inline-flex items-center rounded-full bg-white/15 backdrop-blur border border-white/30 px-3 py-1 text-[11px] tracking-wide uppercase">
+              Affordable WhatsApp smart home
+            </div>
+            <h1 className="text-[2.5rem] leading-[1.05] sm:text-6xl md:text-7xl tracking-tight">
+              Control your home
               <br />
-              <span className="italic text-white/80">Soft life.</span>
+              <span className="italic text-white/85">from WhatsApp.</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-white/85 max-w-lg leading-relaxed">
-              Talk to your home on WhatsApp. Calm, effortless, always in your pocket.
+              Lights, geysers, plugs and more — start with one device today and add the rest when you're ready. No new app to learn.
+            </p>
+            <p className="text-xs sm:text-sm text-white/70 max-w-lg">
+              Installation arranged where available. Available in South Africa · Pilot in Zimbabwe · Waitlist in Zambia.
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
-              <button
-                type="button"
-                onClick={openQualifyChat}
+              <a
+                href="#devices"
                 className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-4 text-sm font-medium shadow-soft hover:-translate-y-0.5 transition-all"
               >
-                Check if my home qualifies
-              </button>
+                Choose what I want to control
+              </a>
               <SeeItWorkButton
                 onArm={() => {
                   soundArmedRef.current = true;
@@ -766,6 +771,118 @@ function Landing() {
           </div>
         </div>
       </section>
+
+      {/* 1b. Device picker */}
+      <section id="devices" className="py-20 md:py-28 px-6 scroll-mt-24">
+        <div className="max-w-6xl mx-auto">
+          <Reveal className="max-w-2xl mb-10 md:mb-14">
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">Step one</div>
+            <h2 className="text-3xl md:text-5xl leading-tight">What would you like to control?</h2>
+            <p className="mt-4 text-muted-foreground text-base md:text-lg">
+              Pick a starting device. We'll check what's possible in your home and install it for you.
+            </p>
+          </Reveal>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+            {[
+              { icon: "💡", label: "Lights", status: "Coming soon" as const },
+              { icon: "🚿", label: "Geyser", status: "Available now" as const },
+              { icon: "🔌", label: "Plugs & appliances", status: "Available now" as const },
+              { icon: "🚪", label: "Gates & security", status: "Custom quote" as const },
+            ].map((d) => {
+              const tone =
+                d.status === "Available now"
+                  ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                  : d.status === "Coming soon"
+                    ? "bg-neutral-100 text-neutral-700 border-neutral-200"
+                    : "bg-amber-50 text-amber-800 border-amber-200";
+              return (
+                <button
+                  key={d.label}
+                  type="button"
+                  onClick={openQualifyChat}
+                  className="group text-left rounded-3xl border border-border/60 bg-card p-5 md:p-6 shadow-soft hover:-translate-y-0.5 hover:shadow-float transition-all"
+                >
+                  <div className="text-3xl md:text-4xl mb-3">{d.icon}</div>
+                  <div className="text-base md:text-lg font-medium">{d.label}</div>
+                  <div className={`mt-3 inline-flex items-center rounded-full border px-2 py-0.5 text-[10.5px] font-medium ${tone}`}>
+                    {d.status}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-6 text-xs text-muted-foreground">
+            Not sure what you need? Tap any tile — a real person will help you pick.
+          </p>
+        </div>
+      </section>
+
+      {/* 1c. Start small */}
+      <section className="py-20 md:py-28 px-6 bg-secondary/40">
+        <div className="max-w-6xl mx-auto">
+          <Reveal className="max-w-2xl mb-10 md:mb-14">
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-4">Affordable & expandable</div>
+            <h2 className="text-3xl md:text-5xl leading-tight">Start small. Add more later.</h2>
+            <p className="mt-4 text-muted-foreground text-base md:text-lg">
+              One device is enough to begin. Every add-on plugs into the same WhatsApp chat — no new app, no new subscription per device.
+            </p>
+          </Reveal>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+            {[
+              {
+                title: "Smart geyser controller",
+                desc: "Switch on and off, set schedules, see weekly electricity usage.",
+                status: "Available now" as const,
+              },
+              {
+                title: "Smart plugs",
+                desc: "Control any appliance — fridge, kettle, borehole pump, pool pump.",
+                status: "Available now" as const,
+              },
+              {
+                title: "Smart lights",
+                desc: "Turn lights on and off or dim from WhatsApp. Rooms or zones.",
+                status: "Coming soon" as const,
+              },
+              {
+                title: "Gates & security",
+                desc: "Open your gate or garage from WhatsApp. Fitted per home.",
+                status: "Custom quote" as const,
+              },
+            ].map((p) => {
+              const tone =
+                p.status === "Available now"
+                  ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                  : p.status === "Coming soon"
+                    ? "bg-neutral-100 text-neutral-700 border-neutral-200"
+                    : "bg-amber-50 text-amber-800 border-amber-200";
+              return (
+                <div
+                  key={p.title}
+                  className="rounded-3xl border border-border/60 bg-card p-5 md:p-6 shadow-soft flex flex-col"
+                >
+                  <div className={`self-start inline-flex items-center rounded-full border px-2 py-0.5 text-[10.5px] font-medium ${tone}`}>
+                    {p.status}
+                  </div>
+                  <h3 className="mt-4 text-lg md:text-xl font-medium">{p.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed flex-1">{p.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-8 rounded-2xl border border-border/60 bg-card p-4 md:p-5 text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">Where we install:</span>{" "}
+            <span className="inline-flex flex-wrap gap-x-4 gap-y-1">
+              <span>🇿🇦 South Africa — Available</span>
+              <span>🇿🇼 Zimbabwe — Pilot</span>
+              <span>🇿🇲 Zambia — Waitlist</span>
+              <span>🌍 Other — Check availability</span>
+            </span>
+          </div>
+        </div>
+      </section>
+
+
 
       {/* 2. Demo */}
       <section id="demo" className="py-24 md:py-32 px-6">
