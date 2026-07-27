@@ -55,7 +55,7 @@ const Email = ({
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>New GeyserBrain lead: {name ?? 'unnamed'} ({city ?? 'unknown'})</Preview>
+    <Preview>New HomeChat lead: {name ?? 'unnamed'} ({city ?? 'unknown'})</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={{ margin: '0 0 20px', fontSize: '22px' }}>
@@ -103,7 +103,7 @@ const Email = ({
 export const template = {
   component: Email,
   subject: (data: Record<string, any>) =>
-    `New GeyserBrain lead: ${data.name ?? 'unnamed'} (${data.city ?? 'unknown'})`,
+    `New HomeChat lead: ${data.name ?? 'unnamed'} (${data.city ?? 'unknown'})`,
   displayName: 'Lead notification',
   to: 'timothy.s@bookestyle.com',
   previewData: {
