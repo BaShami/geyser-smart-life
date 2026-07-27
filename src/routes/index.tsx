@@ -710,6 +710,15 @@ function Landing() {
           <Reveal className="max-w-2xl">
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">See it work</div>
             <h2 className="text-2xl md:text-4xl leading-tight">A conversation, not a control panel.</h2>
+            <p className="mt-3 text-sm md:text-base text-muted-foreground">
+              Watch a real WhatsApp conversation controlling a geyser and lights — press play to see exactly what your chat will look like.
+            </p>
+            <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
+              <li>· Say what you want in plain words.</li>
+              <li>· Get instant confirmation back.</li>
+              <li>· Set schedules by chatting, not tapping menus.</li>
+              <li>· Especially useful for your geyser — see what it actually costs and stop wasting electricity.</li>
+            </ul>
           </Reveal>
           <CompactDemo />
         </div>
@@ -720,19 +729,20 @@ function Landing() {
         <div className="max-w-5xl mx-auto">
           <Reveal className="text-center mb-8 md:mb-12">
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">How it works</div>
-            <h2 className="text-2xl md:text-4xl">Three quiet steps.</h2>
+            <h2 className="text-2xl md:text-4xl">From order to first message.</h2>
           </Reveal>
           <div className="grid md:grid-cols-3 gap-6 md:gap-8">
             {[
-              { n: "01", title: "You pick a device" },
-              { n: "02", title: "An electrician fits it" },
-              { n: "03", title: "You control it on WhatsApp" },
+              { n: "01", title: "You choose what to control", body: "Pick lights, geyser, plugs or gates. Start with one — add more when you're ready." },
+              { n: "02", title: "A certified electrician installs it", body: "Usually 1–2 hours. Neat, safe wiring behind your existing switch, geyser or plug." },
+              { n: "03", title: "You chat with HomeChat on WhatsApp", body: "Turn things on and off, set schedules, and check usage — right from your normal chats." },
             ].map((s) => (
               <div key={s.n} className="text-center md:text-left">
                 <div className="w-12 h-12 mx-auto md:mx-0 rounded-full bg-background border border-border flex items-center justify-center text-xs tracking-widest text-muted-foreground mb-3">
                   {s.n}
                 </div>
                 <h3 className="text-lg md:text-xl leading-snug">{s.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.body}</p>
               </div>
             ))}
           </div>
