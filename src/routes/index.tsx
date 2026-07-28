@@ -10,10 +10,8 @@ import {
   RotateCcw,
   Menu,
   X,
-  MessagesSquare,
-  Clock,
-  Gauge,
 } from "lucide-react";
+
 import heroImg from "@/assets/hero.jpg";
 import reactionVideo from "@/assets/reaction.mp4.asset.json";
 import logoAsset from "@/assets/geyserbrain-logo.png";
