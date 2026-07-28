@@ -681,12 +681,8 @@ function Landing() {
             <p className="mt-3 text-sm md:text-base text-muted-foreground">
               Watch a real WhatsApp conversation controlling a geyser and lights — press play to see exactly what your chat will look like.
             </p>
-            <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
-              <li>· Say what you want in plain words.</li>
-              <li>· Get instant confirmation back.</li>
-              <li>· Set schedules by chatting, not tapping menus.</li>
-              <li>· Especially useful for your geyser — see what it actually costs and stop wasting electricity.</li>
-            </ul>
+
+
           </Reveal>
           <CompactDemo />
         </div>
