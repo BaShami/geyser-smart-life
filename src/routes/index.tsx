@@ -600,19 +600,6 @@ function Landing() {
             })}
           </div>
 
-          {/* Merged benefits row */}
-          <div className="mt-8 grid grid-cols-3 gap-3 md:gap-6 text-center">
-            {[
-              { Icon: MessagesSquare, label: "Control naturally" },
-              { Icon: Clock, label: "Set schedules" },
-              { Icon: Gauge, label: "See usage" },
-            ].map(({ Icon, label }) => (
-              <div key={label} className="flex flex-col items-center gap-2">
-                <Icon className="w-5 h-5 text-muted-foreground" />
-                <div className="text-xs md:text-sm text-muted-foreground">{label}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
