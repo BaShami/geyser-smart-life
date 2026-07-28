@@ -743,11 +743,8 @@ function Landing() {
             })}
           </div>
 
-          {/* Small AI Q&A affordance */}
-          <div className="mt-8">
-            <div className="text-xs text-muted-foreground mb-2">Still have a question?</div>
-            <QualifyChat device={null} country={country} />
-          </div>
+
+
         </div>
       </section>
 
