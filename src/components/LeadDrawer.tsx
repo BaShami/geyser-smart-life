@@ -302,7 +302,7 @@ export function LeadDrawer({ open, onClose, device, country }: Props) {
 
   const price = pricingFor(country);
   const deviceLabel = DEVICES.find((d) => d.id === device)?.label ?? "smart control";
-  const waMessage = `Hi, I'm ${name || "a visitor"} from ${city || COUNTRY_PRICING[country].label}. I'd like ${deviceLabel} with HomeChat. Ref: ${shortId ?? "web"}`;
+  const waMessage = `Hi, I'm ${name || "a visitor"} from ${city || COUNTRY_PRICING[country].label}. I'd like ${deviceLabel} with GeyserBrain. Ref: ${shortId ?? "web"}`;
 
   function openWhatsApp() {
     track({
@@ -433,7 +433,7 @@ export function LeadDrawer({ open, onClose, device, country }: Props) {
                 />
               )}
               <p className="text-[11px] text-muted-foreground">
-                We only use this to contact you about your HomeChat setup.
+                We only use this to contact you about your GeyserBrain setup.
               </p>
               {error && <p className="text-xs text-red-600">{error}</p>}
               <button

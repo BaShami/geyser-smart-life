@@ -1,8 +1,8 @@
-# HomeChat
+# GeyserBrain
 
-> Control your home from WhatsApp. Lights, geyser, plugs and gates — start with one device today, add more when you're ready.
+> Smart home. Soft life. Check, control, schedule and understand what your geyser costs — all from WhatsApp.
 
-HomeChat lets you control your home from the WhatsApp you already use every day. A certified electrician installs a small smart controller (usually 1–2 hours), and from then on you turn things on and off, set schedules and see usage by simple chat — no new app to learn, no dashboard, no manual. Available in South Africa, Zimbabwe and Zambia.
+GeyserBrain brings your home online one device at a time, starting with your geyser. You talk to it in plain language on WhatsApp — no new app, no dashboard, no manual. Ask it to heat up, check what it's costing, or set a schedule, and it just does it.
 
 ## Pages
 

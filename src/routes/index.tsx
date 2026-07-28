@@ -10,13 +10,15 @@ import {
   RotateCcw,
   Menu,
   X,
+  MessagesSquare,
+  Clock,
+  Gauge,
 } from "lucide-react";
-
 import heroImg from "@/assets/hero.jpg";
 import reactionVideo from "@/assets/reaction.mp4.asset.json";
 import logoAsset from "@/assets/geyserbrain-logo.png";
 import { LeadDrawer, DRAWER_STATE_KEY } from "@/components/LeadDrawer";
-
+import { QualifyChat } from "@/components/QualifyChat";
 import { useCountry } from "@/hooks/use-country";
 import {
   COUNTRY_PRICING,
@@ -30,28 +32,24 @@ import { track, getSessionId, ensureUtmCapture } from "@/lib/session";
 
 const WA_NUMBER = "27744224646";
 const wa = (text: string) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
-const WA_HELLO = "Hi HomeChat — I'd like to talk about smart home control.";
+const WA_HELLO = "Hi GeyserBrain — I'd like to talk about smart home control.";
 
 const faqs = [
   {
-    q: "What can HomeChat control right now?",
-    a: "Smart lights, smart geyser control, and smart plugs & appliances are available now. Gates & security are fitted after a short custom assessment of what you already have.",
+    q: "What can GeyserBrain control right now?",
+    a: "Smart light control, smart geyser control, and smart plugs & appliances are available now. Gates & security are fitted after a custom assessment of your existing equipment.",
   },
   {
-    q: "What exactly gets installed?",
-    a: "A small smart controller that a certified electrician wires in (usually behind your switch, geyser isolator or plug). It connects to your Wi-Fi and talks to HomeChat. Nothing visible changes in your home — your walls and fittings stay the same.",
-  },
-  {
-    q: "Where is HomeChat available?",
+    q: "Where is GeyserBrain available?",
     a: AVAILABILITY_LINE + " Other countries: get in touch and we'll check availability.",
   },
   {
     q: "How do the payment options work?",
-    a: "It's a one-time cost for hardware and professional installation — not a subscription. Pay it once, or split the same amount over 4 monthly payments. Nothing to cancel later.",
+    a: "Pay once for hardware and installation, or spread the same amount over 4 monthly payments. The instalment plan is for the hardware and installation only — it isn't a cancel-anytime subscription.",
   },
   {
     q: "How long does installation take?",
-    a: "Usually 1–2 hours per device. A certified electrician fits the controller, tests it and walks you through your first WhatsApp messages before leaving.",
+    a: "Usually 1–2 hours per device. A certified electrician fits the controller and hands over your WhatsApp setup.",
   },
 ];
 
@@ -277,7 +275,7 @@ function CompactDemo() {
           <div className="px-4 py-3 flex items-center gap-3" style={{ backgroundColor: "#075E54", color: "white" }}>
             <div className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center font-semibold">G</div>
             <div>
-              <div className="text-sm font-semibold leading-tight">HomeChat</div>
+              <div className="text-sm font-semibold leading-tight">GeyserBrain</div>
               <div className="text-[11px] text-white/80 h-[14px]">{typing ? "typing…" : "online"}</div>
             </div>
           </div>
@@ -467,8 +465,8 @@ function Landing() {
       <header className="fixed top-3 md:top-4 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-5xl">
         <div className="rounded-full bg-white/80 backdrop-blur-xl border border-white/80 shadow-soft pl-3 pr-3 md:pl-5 md:pr-5 py-2 md:py-3 flex items-center justify-between gap-3">
           <a href="#" className="flex items-center gap-2 font-medium min-w-0 text-neutral-900">
-            <img src={logoAsset} alt="HomeChat" className="h-7 md:h-8 w-auto shrink-0" />
-            <span className="hidden sm:inline truncate">HomeChat</span>
+            <img src={logoAsset} alt="GeyserBrain" className="h-7 md:h-8 w-auto shrink-0" />
+            <span className="hidden sm:inline truncate">GeyserBrain</span>
           </a>
           <nav className="hidden md:flex items-center gap-7 text-sm text-neutral-700">
             <a href="#devices" className="hover:text-neutral-950">Devices</a>
@@ -520,7 +518,7 @@ function Landing() {
       </header>
 
       {/* 1. Hero */}
-      <section className="relative h-[88svh] min-h-[520px] w-full overflow-hidden">
+      <section className="relative h-[70svh] min-h-[480px] w-full overflow-hidden">
         <img
           src={heroImg}
           alt="A calm, softly lit home"
@@ -530,18 +528,22 @@ function Landing() {
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 md:bg-gradient-to-r md:from-black/70 md:via-black/45 md:to-black/10" />
-        <div className="relative z-10 h-full max-w-6xl mx-auto px-6 flex items-end md:items-center pt-24 md:pt-0 pb-12 md:pb-0">
-          <div className="max-w-xl text-white space-y-5">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/10" />
+        <div className="relative z-10 h-full max-w-6xl mx-auto px-6 flex items-end md:items-center pb-12 md:pb-0">
+          <div className="max-w-2xl text-white space-y-4 md:space-y-5">
+            <div className="inline-flex items-center rounded-full bg-white/15 backdrop-blur border border-white/30 px-3 py-1 text-[11px] tracking-wide uppercase">
+              Affordable WhatsApp smart home
+            </div>
             <h1 className="text-[2.25rem] leading-[1.05] sm:text-5xl md:text-6xl tracking-tight">
-              Talk to your home
+              Control your home
               <br />
-              <span className="italic text-white/85">on WhatsApp.</span>
+              <span className="italic text-white/85">from WhatsApp.</span>
             </h1>
-            <p className="text-base md:text-lg text-white/85 max-w-md leading-relaxed">
-              Control your lights, geyser and plugs with a simple chat. No new app.
+            <p className="text-sm sm:text-base md:text-lg text-white/85 max-w-lg leading-relaxed">
+              Lights, geysers, plugs and more — start with one device today and add the rest when you're ready.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <p className="text-[11px] sm:text-xs text-white/70 max-w-lg">{AVAILABILITY_LINE}</p>
+            <div className="flex flex-col sm:flex-row gap-3 pt-1">
               <a
                 href="#devices"
                 onClick={() => track({ event_name: "cta_clicked", funnel_step: "hero", country, metadata: { cta: "choose_a_device" } })}
@@ -554,7 +556,7 @@ function Landing() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => track({ event_name: "whatsapp_clicked", funnel_step: "hero", country })}
-                className="hidden sm:inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium text-white"
+                className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium text-white"
                 style={{ backgroundColor: "#25D366" }}
               >
                 Talk to us
@@ -564,7 +566,6 @@ function Landing() {
         </div>
       </section>
 
-
       {/* 2. Device picker */}
       <section id="devices" className="py-12 md:py-20 px-6 scroll-mt-20">
         <div className="max-w-6xl mx-auto">
@@ -572,7 +573,7 @@ function Landing() {
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">Step one</div>
             <h2 className="text-2xl md:text-4xl leading-tight">What would you like to control?</h2>
             <p className="mt-3 text-sm md:text-base text-muted-foreground">
-              Tap a device — we'll send you the exact price and availability in your area.
+              Tap a device. We'll capture your details and send your price.
             </p>
           </Reveal>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
@@ -598,6 +599,19 @@ function Landing() {
             })}
           </div>
 
+          {/* Merged benefits row */}
+          <div className="mt-8 grid grid-cols-3 gap-3 md:gap-6 text-center">
+            {[
+              { Icon: MessagesSquare, label: "Control naturally" },
+              { Icon: Clock, label: "Set schedules" },
+              { Icon: Gauge, label: "See usage" },
+            ].map(({ Icon, label }) => (
+              <div key={label} className="flex flex-col items-center gap-2">
+                <Icon className="w-5 h-5 text-muted-foreground" />
+                <div className="text-xs md:text-sm text-muted-foreground">{label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -606,13 +620,10 @@ function Landing() {
         <div className="max-w-4xl mx-auto">
           <Reveal className="max-w-2xl mb-6 md:mb-10">
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">Pricing</div>
-            <h2 className="text-2xl md:text-4xl leading-tight">One clear price per device.</h2>
+            <h2 className="text-2xl md:text-4xl leading-tight">Choose your first smart device.</h2>
             <p className="mt-3 text-sm md:text-base text-muted-foreground">
-              Hardware and professional installation, together in one price. Pay it once, or split it over four months.
+              One flat price for hardware and installation. Pay once, or over four months.
             </p>
-            <div className="mt-3 inline-flex items-center rounded-full border border-border/60 bg-background px-3 py-1 text-[11px] font-medium text-muted-foreground">
-              One-time cost · not a subscription
-            </div>
           </Reveal>
 
           <div className="rounded-3xl border border-border/60 bg-card p-5 md:p-8 shadow-soft space-y-6">
@@ -662,10 +673,23 @@ function Landing() {
               </div>
             )}
 
-            <p className="text-[11px] text-muted-foreground">
-              {AVAILABILITY_LINE}
-            </p>
+            <div className="grid sm:grid-cols-3 gap-3">
+              {DEVICES.filter((d) => d.status === "Available now").map((d) => (
+                <button
+                  key={d.id}
+                  onClick={() => openDrawer(d.id as DeviceId)}
+                  className="rounded-2xl border border-border/60 bg-background p-4 text-left hover:-translate-y-0.5 hover:shadow-float transition-all"
+                >
+                  <div className="text-xl">{d.icon}</div>
+                  <div className="mt-2 text-sm font-medium">Start with {d.label}</div>
+                  <div className="mt-2 text-xs text-muted-foreground">Get my price →</div>
+                </button>
+              ))}
+            </div>
 
+            <p className="text-[11px] text-muted-foreground">
+              {AVAILABILITY_LINE} Gates & security are fitted after a custom assessment of your existing equipment.
+            </p>
           </div>
         </div>
       </section>
@@ -676,11 +700,6 @@ function Landing() {
           <Reveal className="max-w-2xl">
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">See it work</div>
             <h2 className="text-2xl md:text-4xl leading-tight">A conversation, not a control panel.</h2>
-            <p className="mt-3 text-sm md:text-base text-muted-foreground">
-              Watch a real WhatsApp conversation controlling a geyser and lights — press play to see exactly what your chat will look like.
-            </p>
-
-
           </Reveal>
           <CompactDemo />
         </div>
@@ -691,20 +710,19 @@ function Landing() {
         <div className="max-w-5xl mx-auto">
           <Reveal className="text-center mb-8 md:mb-12">
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">How it works</div>
-            <h2 className="text-2xl md:text-4xl">From order to first message.</h2>
+            <h2 className="text-2xl md:text-4xl">Three quiet steps.</h2>
           </Reveal>
           <div className="grid md:grid-cols-3 gap-6 md:gap-8">
             {[
-              { n: "01", title: "You choose what to control", body: "Pick lights, geyser, plugs or gates. Start with one — add more when you're ready." },
-              { n: "02", title: "A certified electrician installs it", body: "Usually 1–2 hours. Neat, safe wiring behind your existing switch, geyser or plug." },
-              { n: "03", title: "You chat with HomeChat on WhatsApp", body: "Turn things on and off, set schedules, and check usage — right from your normal chats." },
+              { n: "01", title: "You pick a device" },
+              { n: "02", title: "An electrician fits it" },
+              { n: "03", title: "You control it on WhatsApp" },
             ].map((s) => (
               <div key={s.n} className="text-center md:text-left">
                 <div className="w-12 h-12 mx-auto md:mx-0 rounded-full bg-background border border-border flex items-center justify-center text-xs tracking-widest text-muted-foreground mb-3">
                   {s.n}
                 </div>
                 <h3 className="text-lg md:text-xl leading-snug">{s.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.body}</p>
               </div>
             ))}
           </div>
@@ -716,7 +734,7 @@ function Landing() {
         <div className="max-w-3xl mx-auto">
           <Reveal className="text-center mb-8">
             <div className="text-xs text-muted-foreground uppercase tracking-[0.25em] mb-3">FAQ</div>
-            <h2 className="text-2xl md:text-4xl">Common questions.</h2>
+            <h2 className="text-2xl md:text-4xl">Quiet answers.</h2>
           </Reveal>
           <div className="space-y-3">
             {faqs.map((f, i) => {
@@ -741,8 +759,11 @@ function Landing() {
             })}
           </div>
 
-
-
+          {/* Small AI Q&A affordance */}
+          <div className="mt-8">
+            <div className="text-xs text-muted-foreground mb-2">Still have a question?</div>
+            <QualifyChat device={null} country={country} />
+          </div>
         </div>
       </section>
 
@@ -777,14 +798,14 @@ function Landing() {
       <footer className="py-8 px-6 border-t border-border/60">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
-            <img src={logoAsset} alt="HomeChat" className="h-6 w-auto" />
-            <span className="text-foreground font-medium">HomeChat</span>
+            <img src={logoAsset} alt="GeyserBrain" className="h-6 w-auto" />
+            <span className="text-foreground font-medium">GeyserBrain</span>
           </div>
           <div className="flex items-center gap-6">
             <a href="/privacy" className="hover:text-foreground">Privacy</a>
             <a href="/terms" className="hover:text-foreground">Terms</a>
           </div>
-          <p>© {new Date().getFullYear()} HomeChat</p>
+          <p>© {new Date().getFullYear()} GeyserBrain</p>
         </div>
       </footer>
 
