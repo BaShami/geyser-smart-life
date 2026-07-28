@@ -664,23 +664,10 @@ function Landing() {
               </div>
             )}
 
-            <div className="grid sm:grid-cols-3 gap-3">
-              {DEVICES.filter((d) => d.status === "Available now").map((d) => (
-                <button
-                  key={d.id}
-                  onClick={() => openDrawer(d.id as DeviceId)}
-                  className="rounded-2xl border border-border/60 bg-background p-4 text-left hover:-translate-y-0.5 hover:shadow-float transition-all"
-                >
-                  <div className="text-xl">{d.icon}</div>
-                  <div className="mt-2 text-sm font-medium">Start with {d.label}</div>
-                  <div className="mt-2 text-xs text-muted-foreground">Get my price →</div>
-                </button>
-              ))}
-            </div>
-
             <p className="text-[11px] text-muted-foreground">
-              {AVAILABILITY_LINE} Gates & security are fitted after a custom assessment of your existing equipment.
+              {AVAILABILITY_LINE}
             </p>
+
           </div>
         </div>
       </section>
