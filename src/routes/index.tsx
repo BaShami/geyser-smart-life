@@ -10,15 +10,13 @@ import {
   RotateCcw,
   Menu,
   X,
-  MessagesSquare,
-  Clock,
-  Gauge,
 } from "lucide-react";
+
 import heroImg from "@/assets/hero.jpg";
 import reactionVideo from "@/assets/reaction.mp4.asset.json";
 import logoAsset from "@/assets/geyserbrain-logo.png";
 import { LeadDrawer, DRAWER_STATE_KEY } from "@/components/LeadDrawer";
-import { QualifyChat } from "@/components/QualifyChat";
+
 import { useCountry } from "@/hooks/use-country";
 import {
   COUNTRY_PRICING,
@@ -522,7 +520,7 @@ function Landing() {
       </header>
 
       {/* 1. Hero */}
-      <section className="relative h-[70svh] min-h-[480px] w-full overflow-hidden">
+      <section className="relative h-[88svh] min-h-[520px] w-full overflow-hidden">
         <img
           src={heroImg}
           alt="A calm, softly lit home"
@@ -532,25 +530,18 @@ function Landing() {
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/10" />
-        <div className="relative z-10 h-full max-w-6xl mx-auto px-6 flex items-end md:items-center pt-20 md:pt-0 pb-10 md:pb-0">
-          <div className="max-w-2xl text-white space-y-4 md:space-y-5">
-            <div className="inline-flex items-center rounded-full bg-white/15 backdrop-blur border border-white/30 px-3 py-1 text-[11px] tracking-wide uppercase">
-              A conversation, not a control panel
-            </div>
-            <h1 className="text-[2rem] leading-[1.08] sm:text-5xl md:text-6xl tracking-tight">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 md:bg-gradient-to-r md:from-black/70 md:via-black/45 md:to-black/10" />
+        <div className="relative z-10 h-full max-w-6xl mx-auto px-6 flex items-end md:items-center pt-24 md:pt-0 pb-12 md:pb-0">
+          <div className="max-w-xl text-white space-y-5">
+            <h1 className="text-[2.25rem] leading-[1.05] sm:text-5xl md:text-6xl tracking-tight">
               Talk to your home
               <br />
               <span className="italic text-white/85">on WhatsApp.</span>
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl leading-relaxed">
-              Lights, geyser, plugs and more — start with one device today. An electrician installs it. You control everything by simple chat.
+            <p className="text-base md:text-lg text-white/85 max-w-md leading-relaxed">
+              Control your lights, geyser and plugs with a simple chat. No new app.
             </p>
-            <p className="text-xs sm:text-sm text-white/75 max-w-xl leading-relaxed">
-              Turn things on and off, set schedules, and see usage — all from the WhatsApp you already use every day. No new app to learn.
-            </p>
-            <p className="text-[11px] sm:text-xs text-white/60 max-w-xl">{AVAILABILITY_LINE}</p>
-            <div className="flex flex-col sm:flex-row gap-3 pt-1">
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <a
                 href="#devices"
                 onClick={() => track({ event_name: "cta_clicked", funnel_step: "hero", country, metadata: { cta: "choose_a_device" } })}
@@ -563,7 +554,7 @@ function Landing() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => track({ event_name: "whatsapp_clicked", funnel_step: "hero", country })}
-                className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium text-white"
+                className="hidden sm:inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium text-white"
                 style={{ backgroundColor: "#25D366" }}
               >
                 Talk to us
@@ -572,6 +563,7 @@ function Landing() {
           </div>
         </div>
       </section>
+
 
       {/* 2. Device picker */}
       <section id="devices" className="py-12 md:py-20 px-6 scroll-mt-20">
@@ -606,19 +598,6 @@ function Landing() {
             })}
           </div>
 
-          {/* Merged benefits row */}
-          <div className="mt-8 grid grid-cols-3 gap-3 md:gap-6 text-center">
-            {[
-              { Icon: MessagesSquare, label: "Control naturally" },
-              { Icon: Clock, label: "Set schedules" },
-              { Icon: Gauge, label: "See usage" },
-            ].map(({ Icon, label }) => (
-              <div key={label} className="flex flex-col items-center gap-2">
-                <Icon className="w-5 h-5 text-muted-foreground" />
-                <div className="text-xs md:text-sm text-muted-foreground">{label}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -683,23 +662,10 @@ function Landing() {
               </div>
             )}
 
-            <div className="grid sm:grid-cols-3 gap-3">
-              {DEVICES.filter((d) => d.status === "Available now").map((d) => (
-                <button
-                  key={d.id}
-                  onClick={() => openDrawer(d.id as DeviceId)}
-                  className="rounded-2xl border border-border/60 bg-background p-4 text-left hover:-translate-y-0.5 hover:shadow-float transition-all"
-                >
-                  <div className="text-xl">{d.icon}</div>
-                  <div className="mt-2 text-sm font-medium">Start with {d.label}</div>
-                  <div className="mt-2 text-xs text-muted-foreground">Get my price →</div>
-                </button>
-              ))}
-            </div>
-
             <p className="text-[11px] text-muted-foreground">
-              {AVAILABILITY_LINE} Gates & security are fitted after a custom assessment of your existing equipment.
+              {AVAILABILITY_LINE}
             </p>
+
           </div>
         </div>
       </section>
@@ -713,12 +679,8 @@ function Landing() {
             <p className="mt-3 text-sm md:text-base text-muted-foreground">
               Watch a real WhatsApp conversation controlling a geyser and lights — press play to see exactly what your chat will look like.
             </p>
-            <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
-              <li>· Say what you want in plain words.</li>
-              <li>· Get instant confirmation back.</li>
-              <li>· Set schedules by chatting, not tapping menus.</li>
-              <li>· Especially useful for your geyser — see what it actually costs and stop wasting electricity.</li>
-            </ul>
+
+
           </Reveal>
           <CompactDemo />
         </div>
@@ -779,11 +741,8 @@ function Landing() {
             })}
           </div>
 
-          {/* Small AI Q&A affordance */}
-          <div className="mt-8">
-            <div className="text-xs text-muted-foreground mb-2">Still have a question?</div>
-            <QualifyChat device={null} country={country} />
-          </div>
+
+
         </div>
       </section>
 
