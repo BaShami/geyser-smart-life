@@ -522,7 +522,7 @@ function Landing() {
       </header>
 
       {/* 1. Hero */}
-      <section className="relative h-[70svh] min-h-[480px] w-full overflow-hidden">
+      <section className="relative h-[88svh] min-h-[520px] w-full overflow-hidden">
         <img
           src={heroImg}
           alt="A calm, softly lit home"
@@ -532,25 +532,18 @@ function Landing() {
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/10" />
-        <div className="relative z-10 h-full max-w-6xl mx-auto px-6 flex items-end md:items-center pt-20 md:pt-0 pb-10 md:pb-0">
-          <div className="max-w-2xl text-white space-y-4 md:space-y-5">
-            <div className="inline-flex items-center rounded-full bg-white/15 backdrop-blur border border-white/30 px-3 py-1 text-[11px] tracking-wide uppercase">
-              A conversation, not a control panel
-            </div>
-            <h1 className="text-[2rem] leading-[1.08] sm:text-5xl md:text-6xl tracking-tight">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 md:bg-gradient-to-r md:from-black/70 md:via-black/45 md:to-black/10" />
+        <div className="relative z-10 h-full max-w-6xl mx-auto px-6 flex items-end md:items-center pt-24 md:pt-0 pb-12 md:pb-0">
+          <div className="max-w-xl text-white space-y-5">
+            <h1 className="text-[2.25rem] leading-[1.05] sm:text-5xl md:text-6xl tracking-tight">
               Talk to your home
               <br />
               <span className="italic text-white/85">on WhatsApp.</span>
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl leading-relaxed">
-              Lights, geyser, plugs and more — start with one device today. An electrician installs it. You control everything by simple chat.
+            <p className="text-base md:text-lg text-white/85 max-w-md leading-relaxed">
+              Control your lights, geyser and plugs with a simple chat. No new app.
             </p>
-            <p className="text-xs sm:text-sm text-white/75 max-w-xl leading-relaxed">
-              Turn things on and off, set schedules, and see usage — all from the WhatsApp you already use every day. No new app to learn.
-            </p>
-            <p className="text-[11px] sm:text-xs text-white/60 max-w-xl">{AVAILABILITY_LINE}</p>
-            <div className="flex flex-col sm:flex-row gap-3 pt-1">
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <a
                 href="#devices"
                 onClick={() => track({ event_name: "cta_clicked", funnel_step: "hero", country, metadata: { cta: "choose_a_device" } })}
@@ -563,7 +556,7 @@ function Landing() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => track({ event_name: "whatsapp_clicked", funnel_step: "hero", country })}
-                className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium text-white"
+                className="hidden sm:inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium text-white"
                 style={{ backgroundColor: "#25D366" }}
               >
                 Talk to us
@@ -572,6 +565,7 @@ function Landing() {
           </div>
         </div>
       </section>
+
 
       {/* 2. Device picker */}
       <section id="devices" className="py-12 md:py-20 px-6 scroll-mt-20">
