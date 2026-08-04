@@ -612,6 +612,10 @@ function Landing() {
               </div>
             ))}
           </div>
+          <p className="mt-5 text-center text-xs md:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+            Especially useful for your geyser — see what it actually costs and stop wasting electricity.
+          </p>
+
         </div>
       </section>
 
