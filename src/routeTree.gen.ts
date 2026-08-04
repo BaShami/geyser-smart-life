@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as HouseholdRouteImport } from './routes/household'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTrackRouteImport } from './routes/api/track'
 import { Route as ApiQualifyRouteImport } from './routes/api/qualify'
@@ -20,6 +21,11 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HouseholdRoute = HouseholdRouteImport.update({
+  id: '/household',
+  path: '/household',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -56,6 +62,7 @@ const LovableEmailTransactionalPreviewRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/household': typeof HouseholdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/household-pilot': typeof ApiHouseholdPilotRoute
   '/api/lead': typeof ApiLeadRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/household': typeof HouseholdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/household-pilot': typeof ApiHouseholdPilotRoute
   '/api/lead': typeof ApiLeadRoute
@@ -75,6 +83,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/household': typeof HouseholdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/household-pilot': typeof ApiHouseholdPilotRoute
   '/api/lead': typeof ApiLeadRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/household'
     | '/sitemap.xml'
     | '/api/household-pilot'
     | '/api/lead'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/household'
     | '/sitemap.xml'
     | '/api/household-pilot'
     | '/api/lead'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/household'
     | '/sitemap.xml'
     | '/api/household-pilot'
     | '/api/lead'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HouseholdRoute: typeof HouseholdRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiHouseholdPilotRoute: typeof ApiHouseholdPilotRoute
   ApiLeadRoute: typeof ApiLeadRoute
@@ -129,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/household': {
+      id: '/household'
+      path: '/household'
+      fullPath: '/household'
+      preLoaderRoute: typeof HouseholdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HouseholdRoute: HouseholdRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiHouseholdPilotRoute: ApiHouseholdPilotRoute,
   ApiLeadRoute: ApiLeadRoute,
