@@ -10,15 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as HouseholdRouteImport } from './routes/household'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTrackRouteImport } from './routes/api/track'
 import { Route as ApiQualifyRouteImport } from './routes/api/qualify'
 import { Route as ApiLeadRouteImport } from './routes/api/lead'
+import { Route as ApiHouseholdPilotRouteImport } from './routes/api/household-pilot'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HouseholdRoute = HouseholdRouteImport.update({
+  id: '/household',
+  path: '/household',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +48,11 @@ const ApiLeadRoute = ApiLeadRouteImport.update({
   path: '/api/lead',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiHouseholdPilotRoute = ApiHouseholdPilotRouteImport.update({
+  id: '/api/household-pilot',
+  path: '/api/household-pilot',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
@@ -50,7 +62,9 @@ const LovableEmailTransactionalPreviewRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/household': typeof HouseholdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/household-pilot': typeof ApiHouseholdPilotRoute
   '/api/lead': typeof ApiLeadRoute
   '/api/qualify': typeof ApiQualifyRoute
   '/api/track': typeof ApiTrackRoute
@@ -58,7 +72,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/household': typeof HouseholdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/household-pilot': typeof ApiHouseholdPilotRoute
   '/api/lead': typeof ApiLeadRoute
   '/api/qualify': typeof ApiQualifyRoute
   '/api/track': typeof ApiTrackRoute
@@ -67,7 +83,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/household': typeof HouseholdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/household-pilot': typeof ApiHouseholdPilotRoute
   '/api/lead': typeof ApiLeadRoute
   '/api/qualify': typeof ApiQualifyRoute
   '/api/track': typeof ApiTrackRoute
@@ -77,7 +95,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/household'
     | '/sitemap.xml'
+    | '/api/household-pilot'
     | '/api/lead'
     | '/api/qualify'
     | '/api/track'
@@ -85,7 +105,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/household'
     | '/sitemap.xml'
+    | '/api/household-pilot'
     | '/api/lead'
     | '/api/qualify'
     | '/api/track'
@@ -93,7 +115,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/household'
     | '/sitemap.xml'
+    | '/api/household-pilot'
     | '/api/lead'
     | '/api/qualify'
     | '/api/track'
@@ -102,7 +126,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HouseholdRoute: typeof HouseholdRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiHouseholdPilotRoute: typeof ApiHouseholdPilotRoute
   ApiLeadRoute: typeof ApiLeadRoute
   ApiQualifyRoute: typeof ApiQualifyRoute
   ApiTrackRoute: typeof ApiTrackRoute
@@ -116,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/household': {
+      id: '/household'
+      path: '/household'
+      fullPath: '/household'
+      preLoaderRoute: typeof HouseholdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -146,6 +179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLeadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/household-pilot': {
+      id: '/api/household-pilot'
+      path: '/api/household-pilot'
+      fullPath: '/api/household-pilot'
+      preLoaderRoute: typeof ApiHouseholdPilotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
@@ -158,7 +198,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HouseholdRoute: HouseholdRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiHouseholdPilotRoute: ApiHouseholdPilotRoute,
   ApiLeadRoute: ApiLeadRoute,
   ApiQualifyRoute: ApiQualifyRoute,
   ApiTrackRoute: ApiTrackRoute,
@@ -167,13 +209,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

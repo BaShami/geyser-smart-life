@@ -51,6 +51,11 @@ const faqs = [
     q: "How long does installation take?",
     a: "Usually 1–2 hours per device. A certified electrician fits the controller and hands over your WhatsApp setup.",
   },
+  {
+    q: "What actually gets installed in my home?",
+    a: "A small smart controller that a certified electrician wires in (usually behind your switch, geyser isolator or plug). It connects to your Wi-Fi and talks to GeyserBrain on WhatsApp. Nothing visible changes in your home — your walls and fittings stay the same.",
+  },
+
 ];
 
 /* ---------- Reveal ---------- */
@@ -612,6 +617,10 @@ function Landing() {
               </div>
             ))}
           </div>
+          <p className="mt-5 text-center text-xs md:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+            Especially useful for your geyser — see what it actually costs and stop wasting electricity.
+          </p>
+
         </div>
       </section>
 
