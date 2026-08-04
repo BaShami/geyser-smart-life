@@ -64,6 +64,57 @@ export type Database = {
           },
         ]
       }
+      household_pilot_signups: {
+        Row: {
+          country: string | null
+          created_at: string
+          follow_up_with: string | null
+          frequency: string | null
+          full_name: string
+          household_whatsapp_users: string | null
+          id: string
+          referrer: string | null
+          repeated_responsibility: string | null
+          runs_household: string | null
+          session_id: string | null
+          utm: Json | null
+          whatsapp_number: string
+          would_invite: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          follow_up_with?: string | null
+          frequency?: string | null
+          full_name: string
+          household_whatsapp_users?: string | null
+          id?: string
+          referrer?: string | null
+          repeated_responsibility?: string | null
+          runs_household?: string | null
+          session_id?: string | null
+          utm?: Json | null
+          whatsapp_number: string
+          would_invite?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          follow_up_with?: string | null
+          frequency?: string | null
+          full_name?: string
+          household_whatsapp_users?: string | null
+          id?: string
+          referrer?: string | null
+          repeated_responsibility?: string | null
+          runs_household?: string | null
+          session_id?: string | null
+          utm?: Json | null
+          whatsapp_number?: string
+          would_invite?: string | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           city: string | null
